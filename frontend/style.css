@@ -1,0 +1,229 @@
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oswald Regular'), local('Oswald-Regular'),
+  url('oswald_regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Oswald Bold'), local('Oswald-Bold'), url('oswald_bold.ttf')
+  format('truetype');
+}
+
+html * {
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: #8e0028;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+p {
+    padding: 10px 0;
+}
+
+.clearfix {
+    content: " ";
+    clear: both;
+}
+
+body {
+    background: url('images/background2.png') #5875a0;
+    font-family: Oswald;
+    font-size: 12pt;
+}
+
+#header {
+    width: 440px;
+    height: 125px;
+    margin: auto;
+    background: url('images/header.png') no-repeat;
+}
+
+#panel, #stats, #control, #project {
+    border-radius: 10px;
+    margin: 10px;
+}
+
+#panel {
+    width: 900px;
+    margin: 0 auto;
+    background: #eee;
+    color: #444;
+    border: 3px solid #444;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, .6);
+    font-family: sans-serif;
+}
+
+#panel-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-size: 14pt;
+    font-weight: bold;
+    background: #fff;
+    color: #818d9f;
+    padding: 0.25em 25px;
+    height: 32px;
+    line-height: 32px;
+}
+
+#menu {
+    float: right;
+    list-style: none;
+    display: block;
+    text-align: right;
+}
+
+#menu li {
+    display: inline;
+}
+
+#menu {
+    list-style: none;
+}
+
+#menu a {
+    text-decoration: none;
+}
+
+#menu img {
+    width: 32px;
+    margin: 1px;
+    vertical-align: middle;
+}
+
+#menu img:hover {
+    margin: 0;
+    border: 1px solid #888;
+}
+
+a.button {
+    display: inline-block;
+    border-radius: 5px;
+    margin-top: -0.2em;
+    padding: 0.2em;
+}
+
+a.button:hover {
+    background: #ddd;
+}
+
+#identity {
+    padding: 0.25em 25px;
+    width: 850px;
+}
+
+#identity input {
+    width: 10em;
+}
+
+.points {
+    font-size: 250%;
+    font-weight: 900;
+    color: #fb6436;
+}
+
+.team-points {
+    color: #ff5315;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+#status {
+    margin-top: -10px;
+}
+
+#status-image {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: 3px solid #000;
+    margin-right: 10px;
+    margin-top: -10px;
+    float: left;
+}
+
+#status-image.running {
+    background: url('images/running.gif') no-repeat 3px 3px #64ca7d;
+}
+
+#progress {
+    border: 1px solid black;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+    margin-bottom: 1em;
+}
+
+#progress div {
+    height: 100%;
+    width: 50%;
+    text-align: right;
+    background: #7a97c2;
+    font-weight: bold;
+    padding: 2px 5px;
+}
+
+#status-text {
+    font-weight: bold;
+}
+
+#eta {
+    font-weight: bold;
+}
+
+#control {
+    padding: 1em;
+    width: 345px;
+    float: left;
+}
+
+.folding-start {display: none;}
+
+.folding-start .button, .folding-stop .button {
+    color: #fff;
+    font-size: 32px;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+    border: 2px solid #303031;
+    text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+    -moz-border-radius: 0.3em;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
+    cursor: pointer;
+}
+
+.folding-start .button {
+    background: url('images/button_bg.png') repeat-x 0 0;
+    background-color: #46a95f;
+}
+
+.folding-start .button:hover {background-color: #2c9345;}
+
+.folding-stop .button {
+    background: url('images/button_bg.png') repeat-x 0 0;
+    background-color: #e03131;
+}
+
+.folding-stop .button:hover {background-color: #ca2b2c}
+
+#project {
+    border-radius: 10px;
+    background: #fff;
+    padding: 1em;
+    width: 450px;
+    float: right;
+}
+
+#dialogs {
+    display: none;
+}

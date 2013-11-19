@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Folding@home Chrome Client</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="stylesheet" href="style.css"/>
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="https://apis.google.com/js/plusone.js"></script>
+    <script src="js/intercom.min.js"></script>
+    <script src="js/main.js"></script>
+  </head>
+
+  <body>
+    <div id="header"></div>
+
+    <div id="panel">
+      <div id="panel-header">
+        <span>CONTROL PANEL</span>
+        <ul id="menu">
+          <li>Share:</li>
+          <li><a href="#" class="email">
+              <img src="images/email.png"/>
+          </a></li>
+          <li><a href="#" class="twitter">
+              <img src="images/twitter.png"/>
+          </a></li>
+          <li><a href="#" class="facebook">
+              <img src="images/facebook.png"/>
+          </a></li>
+          <li><g:plusone href="http://folding.stanford.edu/" size="medium">
+          </g:plusone></li>
+
+          <li>|</li>
+	      <li><a href="#" class="report-bug">
+              <img src="images/report-bug.png"/>
+          </a></li>
+
+          <li><a class="news button" href="#">Learn</a></li>
+          <li><a class="news button" href="#">News</a></li>
+          <li><a class="help button" href="#">Help</a></li>
+        </ul>
+      </div>
+
+      <div id="identity">
+        <p>
+          Folding as <input class="user" value="Anonymous"/> for
+          <a href="#">team</a> <input class="team" value="0"/> with
+          <a href="#">passkey</a> <input class="passkey" value=""/>.
+          <br/>
+          You have earned <span class="points">12,345</span> points and
+          your team has earned <span class="team-points">1,234,567</span>
+          points.
+        </p>
+      </div>
+
+      <div id="control">
+        <div id="status">
+          <div id="status-image" class="running"></div>
+          <div id="progress"><div>50%</div></div>
+          <div id="status-text">Running normally.</div>
+        </div>
+
+        <p>
+          Simulation will complete in approximately
+          <span id="eta">10 minutes</span>.
+        </p>
+
+        <div class="folding-start">
+          <div class="button">Start Folding</div>
+          <p>
+            Folding is currently paused.  When you are ready click the button
+            above to start folding.
+          </p>
+        </div>
+        <div class="folding-stop">
+          <div class="button">Stop Folding</div>
+          <p>
+            When you visit this page your computer will automatically start
+            to fight disease by running protein folding simulations for
+            scientists around the world.  We call this folding.  You can stop
+            folding at any time by clicking the button above.
+          </p>
+        </div>
+      </div>
+
+      <div id="project">
+        <h3>You are contributing to project
+          <span class="project">1234</span>.</h3>
+        Loading...
+        <a class="more" href="#">...more info</a>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+  </body>
+
+  <div id="dialogs">
+    <div id="help-dialog"></div>
+    <div id="learn-dialog"></div>
+    <div id="team-dialog"></div>
+    <div id="user-dialog"></div>
+    <div id="points-dialog"></div>
+    <div id="project-dialog"></div>
+
+    <div id="requriements-dialog">
+      This Folding@home client requires:
+      <ul>
+        <li>HTML5 Local Storage</li>
+        <li>Native Client (NaCl)</li>
+      </ul>
+
+      Generally this means you need to install
+      <a href="http://google.com/chrome/">Google Chrome</a>.
+    </div>
+  </div>
+</html>
