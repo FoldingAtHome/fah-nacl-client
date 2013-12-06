@@ -37,7 +37,7 @@ p {
 }
 
 body {
-    background: url('images/background.png') #5875a0;
+    background: url('../images/background.png') #5875a0;
     font-family: Oswald;
     font-size: 12pt;
 }
@@ -46,7 +46,7 @@ body {
     width: 440px;
     height: 125px;
     margin: auto;
-    background: url('images/header.png') no-repeat;
+    background: url('../images/header.png') no-repeat;
 }
 
 #panel, #stats, #control, #project {
@@ -152,35 +152,35 @@ a.button:hover {
 }
 
 #status-image.running {
-    background: url('images/running.gif') no-repeat 3px 3px #64ca7d;
+    background: url('../images/running.gif') no-repeat 3px 3px #64ca7d;
 }
 
 #status-image.uploading {
-    background: url('images/uploading.gif') no-repeat 3px 3px #64ca7d;
+    background: url('../images/uploading.gif') no-repeat 3px 3px #64ca7d;
 }
 
 #status-image.downloading {
-    background: url('images/downloading.gif') no-repeat 3px 3px #64ca7d;
+    background: url('../images/downloading.gif') no-repeat 3px 3px #64ca7d;
 }
 
 #status-image.waiting {
-    background: url('images/waiting.gif') no-repeat 8px 8px #ffffff;
+    background: url('../images/waiting.gif') no-repeat 8px 8px #ffffff;
 }
 
 #status-image.error {
-    background: url('images/error.gif') no-repeat 3px 3px #ff0000;
+    background: url('../images/error.gif') no-repeat 3px 3px #ff0000;
 }
 
 #status-image.stopped {
-    background: url('images/stopped.gif') no-repeat 3px 3px #ff0000;
+    background: url('../images/stopped.gif') no-repeat 3px 3px #ff0000;
 }
 
 #status-image.pausing {
-    background: url('images/waiting.gif') no-repeat 8px 8px #ffff00;
+    background: url('../images/waiting.gif') no-repeat 8px 8px #ffff00;
 }
 
 #status-image.paused {
-    background: url('images/paused.gif') no-repeat 3px 3px #ffff00;
+    background: url('../images/paused.gif') no-repeat 3px 3px #ffff00;
 }
 
 #progress {
@@ -228,14 +228,14 @@ a.button:hover {
 }
 
 .folding-start .button {
-    background: url('images/button_bg.png') repeat-x 0 0;
+    background: url('../images/button_bg.png') repeat-x 0 0;
     background-color: #46a95f;
 }
 
 .folding-start .button:hover {background-color: #2c9345;}
 
 .folding-stop .button {
-    background: url('images/button_bg.png') repeat-x 0 0;
+    background: url('../images/button_bg.png') repeat-x 0 0;
     background-color: #e03131;
 }
 

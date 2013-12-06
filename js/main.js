@@ -323,6 +323,7 @@ function start_wu(data) {
     fah.wu = wu;
 
     status_set('running', 'Starting work unit.');
+    progress_start(0);
     fah.nacl.postMessage(['start', wu.sha256, str2ab(data[2])]);
 }
 
