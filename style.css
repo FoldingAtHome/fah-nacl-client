@@ -19,6 +19,7 @@ html * {
 }
 
 a {
+    outline: none;
     color: #8e0028;
 }
 
@@ -36,7 +37,7 @@ p {
 }
 
 body {
-    background: url('images/background2.png') #5875a0;
+    background: url('images/background.png') #5875a0;
     font-family: Oswald;
     font-size: 12pt;
 }
@@ -96,12 +97,11 @@ body {
 
 #menu img {
     width: 32px;
-    margin: 1px;
+    border: 1px solid #fff;
     vertical-align: middle;
 }
 
 #menu img:hover {
-    margin: 0;
     border: 1px solid #888;
 }
 
@@ -155,6 +155,34 @@ a.button:hover {
     background: url('images/running.gif') no-repeat 3px 3px #64ca7d;
 }
 
+#status-image.uploading {
+    background: url('images/uploading.gif') no-repeat 3px 3px #64ca7d;
+}
+
+#status-image.downloading {
+    background: url('images/downloading.gif') no-repeat 3px 3px #64ca7d;
+}
+
+#status-image.waiting {
+    background: url('images/waiting.gif') no-repeat 8px 8px #ffffff;
+}
+
+#status-image.error {
+    background: url('images/error.gif') no-repeat 3px 3px #ff0000;
+}
+
+#status-image.stopped {
+    background: url('images/stopped.gif') no-repeat 3px 3px #ff0000;
+}
+
+#status-image.pausing {
+    background: url('images/waiting.gif') no-repeat 8px 8px #ffff00;
+}
+
+#status-image.paused {
+    background: url('images/paused.gif') no-repeat 3px 3px #ffff00;
+}
+
 #progress {
     border: 1px solid black;
     border-radius: 10px;
@@ -164,19 +192,16 @@ a.button:hover {
 }
 
 #progress div {
-    height: 100%;
-    width: 50%;
+    height: 1.25em;
+    width: 0;
+    margin-left: -9px;
     text-align: right;
     background: #7a97c2;
     font-weight: bold;
-    padding: 2px 5px;
+    padding: 2px 2px 2px 10px;
 }
 
 #status-text {
-    font-weight: bold;
-}
-
-#eta {
     font-weight: bold;
 }
 
@@ -214,7 +239,7 @@ a.button:hover {
     background-color: #e03131;
 }
 
-.folding-stop .button:hover {background-color: #ca2b2c}
+.folding-stop .button:hover {background-color: #ca2b2c;}
 
 #project {
     border-radius: 10px;
@@ -226,4 +251,27 @@ a.button:hover {
 
 #dialogs {
     display: none;
+}
+
+.ui-dialog ul, .ui-dialog ol {
+    margin: 1em;
+}
+
+.ui-dialog li {
+    margin: 0 1em;
+}
+
+#fahcore {
+    width: 0;
+    height: 0;
+}
+
+img.icon {
+    float: right;
+}
+
+.ui-widget-overlay {
+    opacity: 0.6;
+    filter: alpha(opacity = 60);
+    background: #000;
 }

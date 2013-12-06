@@ -4,11 +4,13 @@
     <meta charset="utf-8"/>
     <title>Folding@home Chrome Client</title>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
-    <link rel="stylesheet" href="style.css"/>
     <script src="js/jquery-1.10.2.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="https://apis.google.com/js/plusone.js"></script>
     <script src="js/intercom.min.js"></script>
+    <link rel="stylesheet" href="style.css"/>
     <script src="js/main.js"></script>
   </head>
 
@@ -57,14 +59,14 @@
 
       <div id="control">
         <div id="status">
-          <div id="status-image" class="running"></div>
-          <div id="progress"><div>50%</div></div>
-          <div id="status-text">Running normally.</div>
+          <div id="status-image" class="stopped"></div>
+          <div id="progress"><div></div></div>
+          <div id="status-text">Initializing.</div>
         </div>
 
         <p>
-          Simulation will complete in approximately
-          <span id="eta">10 minutes</span>.
+          Current operation will complete in<br/>
+          <span id="eta">unknown time</span>.
         </p>
 
         <div class="folding-start">
@@ -87,9 +89,27 @@
 
       <div id="project">
         <h3>You are contributing to project
-          <span class="project">1234</span>.</h3>
-        Loading...
-        <a class="more" href="#">...more info</a>
+          <span class="project">2968</span>.</h3>
+        <p>
+          This project folds a small beta-hairpin peptide, trpzip2. This
+          peptide is a model system that has been studied by many other groups.
+          Here, we aim to simulate the
+          <a href="https://en.wikipedia.org/wiki/Infrared_spectroscopy">IR
+            spectra</a> of trpzip2 as it folds. We are studying this with two
+          different projects: 2968 and 2969, each at different temperatures of
+          300 and 350 Kelvin, respectively.
+        </p>
+        <img style="float:right" src="images/xuhui.jpeg"/>
+        <p>
+          This project is managed by Prof. Xuhui Huang at Hong Kong University
+          of Science and Technology.
+        </p>
+        <p>
+          The main goal of the Huang lab is to understand and manipulate
+          fundamental biological processes associated with conformational
+          changes by developing and applying novel
+          <a class="more" href="#">...more info</a>
+        </p>
       </div>
 
       <div class="clearfix"></div>
@@ -104,7 +124,9 @@
     <div id="points-dialog"></div>
     <div id="project-dialog"></div>
 
-    <div id="requriements-dialog">
+    <div title="Missing Requirements" id="requirements-dialog">
+      <img class="icon" src="images/error.png"/>
+
       This Folding@home client requires:
       <ul>
         <li>HTML5 Local Storage</li>
@@ -114,5 +136,14 @@
       Generally this means you need to install
       <a href="http://google.com/chrome/">Google Chrome</a>.
     </div>
+  </div>
+  <div id="overlay"></div>
+  <div id="listener">
+    <script>
+      var listener = document.getElementById('listener');
+      listener.addEventListener('load', moduleLoaded, true);
+      listener.addEventListener('message', handleMessage, true);
+    </script>
+    <embed id="fahcore" src="fahcore.nmf" type="application/x-nacl"/>
   </div>
 </html>
