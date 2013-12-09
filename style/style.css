@@ -176,11 +176,11 @@ a.button:hover {
 }
 
 #status-image.pausing {
-    background: url('../images/waiting.gif') no-repeat 8px 8px #ffff00;
+    background: url('../images/waiting.gif') no-repeat 8px 8px #fff276;
 }
 
 #status-image.paused {
-    background: url('../images/paused.gif') no-repeat 3px 3px #ffff00;
+    background: url('../images/paused.gif') no-repeat 3px 3px #fff276;
 }
 
 #progress {
@@ -203,6 +203,10 @@ a.button:hover {
 
 #status-text {
     font-weight: bold;
+}
+
+#eta {
+    height: 2.5em;
 }
 
 #control {

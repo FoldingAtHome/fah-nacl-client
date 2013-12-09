@@ -70,18 +70,24 @@ function have_local_storage() {
 
 
 function ab2str(buf) {
-  return String.fromCharCode.apply(null, new Uint8Array(buf));
+    var s = "";
+    var bufView = new Uint8Array(buf);
+
+    for (var i = 0; i < bufView.length; i++)
+        s += String.fromCharCode(bufView[i]);
+
+    return s;
 }
 
 
 function str2ab(str) {
-  var buf = new ArrayBuffer(str.length);
-  var bufView = new Uint8Array(buf);
+    var buf = new ArrayBuffer(str.length);
+    var bufView = new Uint8Array(buf);
 
-  for (var i = 0, strLen = str.length; i < strLen; i++)
-    bufView[i] = str.charCodeAt(i);
+    for (var i = 0; i < str.length; i++)
+        bufView[i] = str.charCodeAt(i);
 
-  return buf;
+    return buf;
 }
 
 
@@ -113,7 +119,9 @@ function handleMessage(event) {
         break;
 
     case cmd == 'step': step_wu(event.data[1], event.data[2]); break;
-    case cmd == 'results': finish_wu(event.data[1], event.data[2]); break;
+    case cmd == 'results':
+        finish_wu(event.data[1], event.data[2], event.data[3]);
+        break;
     case cmd == 'paused': folding_paused(); break;
     case cmd == 'unpaused': folding_unpaused(); break;
     default: debug(event.data); break;
@@ -125,15 +133,28 @@ function handleMessage(event) {
 function progress_start(total) {
     fah.progress_total = total;
     $('#progress div').css({width: 0}).text('0.0%');
-    $('#eta').text('unknown time');
+    $('#eta').text('');
 }
 
 
 function progress_update(current, eta) {
-    var percent = (current / fah.progress_total * 100).toFixed(1) + '%';
-    $('#progress div').css({width: percent}).text(percent);
+    if (fah.pausing) {
+        $('#progress div')
+            .css({width: '100%', 'text-align': 'center', background: '#fff276'})
+            .text('Paused');
+        $('#eta').text('');
+        return;
+    }
 
-    if (typeof eta != 'undefined') $('#eta').text('about ' + human_time(eta));
+    var percent = (current / fah.progress_total * 100).toFixed(1) + '%';
+    $('#progress div')
+        .css({width: percent, 'text-align': 'right', background: '#7a97c2'})
+        .text(percent);
+
+    if (typeof eta != 'undefined')
+        $('#eta')
+        .text('The current operation will complete in about ' +
+              human_time(Math.floor(eta)));
     else $('#eta').text('');
 }
 
@@ -173,26 +194,31 @@ function backoff(call, id, msg) {
 }
 
 
-function countdown(delay, call) {
-    if (!fah.paused) {
-        if (fah.pausing) status_set('pausing', fah.msg);
-        progress_update(fah.progress_total - delay / 1000, delay / 1000);
+function countdown_paused(call) {
+    if (fah.pausing) setTimeout(function () {countdown_paused(call)}, 250);
+    else {
+        folding_unpaused();
+        call();
     }
+}
 
-    if (delay <= 0) {
-        if (fah.pausing) {
-            folding_paused();
-            setTimeout(function () {countdown(0, call);}, 250);
 
-        } else {
-            if (fah.paused) folding_unpaused();
-            call();
-        }
-
+function countdown(delay, call) {
+    if (fah.pausing) {
+        folding_paused();
+        progress_update(0);
+        countdown_paused(call);
         return;
     }
 
-    var delta = Math.min(1000, delay);
+    progress_update(fah.progress_total - delay / 1000, delay / 1000);
+
+    if (delay <= 0) {
+        call();
+        return;
+    }
+
+    var delta = Math.min(250, delay);
     setTimeout(function () {countdown(delay - delta, call);}, delta);
 }
 
@@ -206,6 +232,7 @@ function server_call(url, data, success, error) {
     data.team = fah.team;
     data.passkey = fah.passkey;
 
+    url += '?' + Math.random();
     $.ajax({url: url, type: 'POST', data: JSON.stringify(data),
             dataType: 'json', contentType: 'application/json; charset=utf-8'})
         .done(success).fail(error);
@@ -219,6 +246,14 @@ function as_call(cmd, data, success, error) {
 
 function ws_call(ws, cmd, data, success, error) {
     server_call('http://' + ws + ':8080/api/' + cmd, data, success, error);
+}
+
+
+function wu_return(server, success, error) {
+    // TODO monitor upload progress
+    ws_call(server, 'results',
+            {wu: fah.wu, results: fah.results, signature: fah.signature,
+             data: fah.data}, success, error);
 }
 
 
@@ -278,7 +313,7 @@ function request_id_error(jqXHR, status, error) {
 function request_assignment() {
     status_set('downloading', 'Requesting a work server assignment.');
     delete fah.results;
-    as_call('assign', {id: get_id()}, request_wu, assign_error);
+    as_call('assign', {client_id: get_id()}, request_wu, assign_error);
 }
 
 
@@ -291,7 +326,7 @@ function assign_error(jqXHR, status, error) {
 
 
 function request_wu(data) {
-    if (typeof data == 'undefined' || data[0] != 'assign') {
+    if (typeof data == 'undefined' || data[0] != 'assign' || data.length < 4) {
         debug('Unexpected response to AS assignment request: ', data);
         assign_error();
         return;
@@ -303,6 +338,7 @@ function request_wu(data) {
     debug('WS:', assign);
     fah.ws = assign.ws;
     fah.project = assign.project;
+    fah.as_cert = data[3];
 
     status_set('downloading', 'Requesting a work unit.');
 
@@ -312,7 +348,7 @@ function request_wu(data) {
 
 
 function start_wu(data) {
-    if (typeof data == 'undefined' || data[0] != 'wu') {
+    if (typeof data == 'undefined' || data[0] != 'wu' || data.length != 5) {
         debug('Unexpected response to WU assignment request: ', data);
         assign_error();
         return;
@@ -321,10 +357,12 @@ function start_wu(data) {
     var wu = data[1];
     debug('WU:', wu);
     fah.wu = wu;
+    fah.wu_signature = data[2];
 
     status_set('running', 'Starting work unit.');
     progress_start(0);
-    fah.nacl.postMessage(['start', wu.sha256, str2ab(data[2])]);
+    fah.nacl.postMessage(['start', JSON.stringify(wu), data[2], data[3],
+                          fah.as_cert, str2ab(data[4])]);
 }
 
 
@@ -336,24 +374,18 @@ function step_wu(total, count) {
 }
 
 
-function finish_wu(checksum, results) {
+function finish_wu(results, signature, data) {
     status_set('running', 'Finishing work unit.');
-    fah.checksum = checksum;
-    fah.results = results;
+    fah.results = JSON.parse(results);
+    fah.signature = signature;
+    fah.data = data;
     return_ws();
+    backoff_reset('ws');
 }
 
 
 function return_ws() {
-    backoff_reset('ws');
-    request_assignment();
-
-    return; // TODO
-
-    // TODO monitor upload progress
-
-    ws_call(fah.ws, 'results', {checksum: fah.checksum, results: fah.results},
-            return_ws_results, return_cs);
+    wu_return(fah.ws, return_ws_results, return_cs);
 }
 
 
@@ -364,12 +396,10 @@ function return_ws_results(data) {
 
 
 function return_cs(jqXHR, status, error) {
-    if (typeof status != 'undefined')
-        debug(status + ': WU return to WS failed.', error);
+    debug('WU return to WS failed:', error);
 
-    ws_call(fah.wu.cs, 'results', {checksum: fah.checksum,
-                                   results: fah.results}, return_cs_results,
-            return_cs_error);
+    if (fah.wu.cs) wu_return(fah.wu.cs, return_cs_results, return_cs_error);
+    else backoff(return_ws, 'return', 'Waiting to retry sending results');
 }
 
 
@@ -380,15 +410,13 @@ function return_cs_results(data) {
 
 
 function return_cs_error(jqXHR, status, error) {
-    if (typeof status != 'undefined')
-        debug(status + ':WU return to CS failed.', error);
+    debug('WU return to CS failed:', error);
     backoff(return_ws, 'return', 'Waiting to retry sending results');
 }
 
 
 function folding_unpaused() {
     fah.paused = false;
-
     status_set(fah.pause_status, fah.pause_msg);
 }
 
@@ -401,7 +429,7 @@ function folding_paused() {
     fah.pause_msg = fah.msg;
 
     status_set('paused', 'Press the start button to continue.');
-    $('#eta').text('unknown time');
+    $('#eta').text('');
 }
 
 
