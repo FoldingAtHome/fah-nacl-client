@@ -155,7 +155,7 @@ function watchdog_clear() {
 
 
 // NaCl ************************************************************************
-function moduleLoading() {
+function module_loading() {
     watchdog_kick();
     debug("NaCl module loading");
     status_set('downloading', 'Downloading the Folding@home software in your ' +
@@ -163,32 +163,28 @@ function moduleLoading() {
 }
 
 
-function moduleProgress(event) {
+function module_progress(event) {
     watchdog_kick();
 
-    var percent = 0.0;
-    var msg = 'Computing...';
+    var total = event.total ? event.total : 18000000;
+    var percent = (event.loaded / total * 100.0).toFixed(1);
+    var msg = percent + '%';
 
-    if (event.lengthComputable && event.total > 0) {
-        fah.progress_total = event.total;
-        progress_update(event.loaded);
+    fah.progress_total = total;
+    progress_update(event.loaded);
 
-        percent = (event.loaded / event.total * 100.0).toFixed(1);
-        msg = percent + '%';
-    }
-
-    debug('load progress: ' + msg + ' (' + event.loaded + ' of ' + event.total +
+    debug('load progress: ' + msg + ' (' + event.loaded + ' of ' + total +
           ' bytes)');
 }
 
 
-function moduleLoadFailed() {
+function module_load_failed() {
     dialog_open('load-failed', false);
 }
 
 
-function moduleLoaded() {
-    watchdog_set(30000, moduleLoadFailed);
+function module_loaded() {
+    watchdog_set(30000, module_load_failed);
 
     debug("NaCl module loaded");
     fah.nacl = document.getElementById('fahcore');
@@ -196,12 +192,12 @@ function moduleLoaded() {
 }
 
 
-function moduleTimeout() {
+function module_timeout() {
     dialog_open('requirements', false);
 }
 
 
-function handleMessage(event) {
+function handle_message(event) {
     var cmd = (typeof event.data == 'string') ? event.data : event.data[0];
 
     switch (true) {
@@ -563,5 +559,5 @@ $(function () {
     $('.folding-stop .button').on('click', pause_folding);
     $('.folding-start .button').on('click', unpause_folding);
 
-    watchdog_set(5000, moduleTimeout);
+    watchdog_set(5000, module_timeout);
 });

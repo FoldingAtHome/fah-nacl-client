@@ -179,10 +179,10 @@
   <div id="listener">
     <script>
       var listener = document.getElementById('listener');
-      listener.addEventListener('loadstart', moduleLoading, true);
-      listener.addEventListener('progress', moduleProgress, true);
-      listener.addEventListener('load', moduleLoaded, true);
-      listener.addEventListener('message', handleMessage, true);
+      listener.addEventListener('loadstart', module_loading, true);
+      listener.addEventListener('progress', module_progress, true);
+      listener.addEventListener('load', module_loaded, true);
+      listener.addEventListener('message', handle_message, true);
     </script>
     <embed id="fahcore" src="fahcore_b0.nmf" type="application/x-nacl"/>
   </div>
