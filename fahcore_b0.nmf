@@ -1,5 +1,8 @@
 {
+  "files": {},
   "program": {
-    "x86-64": {"url": "fahcore_b0.nexe"}
+    "x86-64": {"url": "fahcore_b0-x86_64.nexe"},
+    "i686": {"url": "fahcore_b0-i686.nexe"},
+    "x86-32": {"url": "fahcore_b0-i686.nexe"}
   }
 }

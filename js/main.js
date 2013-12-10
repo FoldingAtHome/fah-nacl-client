@@ -24,13 +24,14 @@
                         joseph@cauldrondevelopment.com
 */
 
-var as_url = 'http://fah.stanford.edu:8080';
-//var as_url = 'http://localhost:8888';
-
 var fah = {
     version: '8.0.0',
     user: 'Anonymous',
     team: 0,
+
+    stats_url: 'http://folding.stanford.edu/stats.py',
+    project_url: 'http://folding.stanford.edu/project-jsonp.py',
+    as_url: 'http://fah.stanford.edu:8080',
 
     min_delay: 15,
     max_delay: 15 * 60,
@@ -224,6 +225,35 @@ function handle_message(event) {
 }
 
 
+function module_error(event) {
+    debug('NaCl module error');
+}
+
+
+// Projects *********************************************************************
+function project_set(id) {
+}
+
+
+function project_update(data) {
+    if (data[0] != 'project') ;
+}
+
+
+function project_load(id) {
+    if (!id || fah.projects[id]) return;
+
+    $.ajax({
+        url: fah.project_url,
+        type: 'GET',
+        data: {'id': id, 'version': fah.version},
+        cache: true,
+        dataType: 'jsonp',
+        success: project_update
+    });
+}
+
+
 // UI Status *******************************************************************
 function progress_start(total) {
     fah.progress_total = total;
@@ -355,7 +385,7 @@ function server_call(url, data, success, error) {
 
 
 function as_call(cmd, data, success, error) {
-    server_call(as_url + '/api/' + cmd, data, success, error);
+    server_call(fah.as_url + '/api/' + cmd, data, success, error);
 }
 
 
