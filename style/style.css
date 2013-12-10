@@ -1,3 +1,29 @@
+/*
+              This file is part of the Folding@home NaCl Client
+
+          Copyright (c) 2013, Hong Kong University Science & Technology
+                 Copyright (c) 2013, Stanford University
+                             All rights reserved.
+
+        This software is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Lesser General Public License
+        as published by the Free Software Foundation, either version 2.1 of
+        the License, or (at your option) any later version.
+
+        This software is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public
+        License along with this software.  If not, see
+        <http://www.gnu.org/licenses/>.
+
+                For information regarding this software email:
+                               Joseph Coffland
+                        joseph@cauldrondevelopment.com
+*/
+
 @font-face {
   font-family: 'Oswald';
   font-style: normal;
@@ -278,4 +304,12 @@ img.icon {
     opacity: 0.6;
     filter: alpha(opacity = 60);
     background: #000;
+}
+
+#footer {
+    width: 440px;
+    margin: 1em auto;
+    font-weight: normal;
+    color: #444;
+    font-size: 80%;
 }
