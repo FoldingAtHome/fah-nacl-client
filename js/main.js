@@ -24,7 +24,7 @@
                         joseph@cauldrondevelopment.com
 */
 
-var as_url = 'http://fah.stanford.edu:8888';
+var as_url = 'http://fah.stanford.edu:8080';
 //var as_url = 'http://localhost:8888';
 
 var fah = {
@@ -35,7 +35,6 @@ var fah = {
     min_delay: 15,
     max_delay: 15 * 60,
 
-    timeout: setTimeout(moduleTimeout, 3000),
     pausing: false,
     paused: false,
 
@@ -117,8 +116,57 @@ function str2ab(str) {
 }
 
 
+function watchdog_timeout() {
+    moduleTimeout();
+}
+
+
+function watchdog_set(t) {
+    fah.watchdog_time = t;
+    fah.watchdog = setTimeout(watchdog_timeout, t);
+}
+
+
+function watchdog_kick() {
+    clearTimeout(fah.watchdog);
+    watchdog_set(fah.watchdog_time);
+}
+
+
+function watchdog_clear() {
+    clearTimeout(fah.watchdog);
+}
+
+
 // NaCl ************************************************************************
+function moduleLoading() {
+    debug("NaCl module loading");
+    watchdog_kick();
+}
+
+
+function moduleProgress(event) {
+    watchdog_kick();
+
+    var percent = 0.0;
+    var msg = 'Computing...';
+
+    if (event.lengthComputable && event.total > 0) {
+        fah.progress_total = event.total;
+        progress_update(event.loaded);
+
+        percent = (event.loaded / event.total * 100.0).toFixed(1);
+        msg = percent + '%';
+    }
+
+    debug('load progress: ' + msg + ' (' + event.loaded + ' of ' + event.total +
+          ' bytes)');
+}
+
+
 function moduleLoaded() {
+    watchdog_kick();
+
     debug("NaCl module loaded");
     fah.nacl = document.getElementById('fahcore');
     fah.nacl.postMessage('ping');
@@ -140,7 +188,7 @@ function handleMessage(event) {
     switch (true) {
     case cmd == 'pong':
         debug("NaCl module responded");
-        clearTimeout(fah.timeout);
+        watchdog_clear();
         init(); // Start client
         break;
 
@@ -495,4 +543,6 @@ $(function () {
 
     $('.folding-stop .button').on('click', pause_folding);
     $('.folding-start .button').on('click', unpause_folding);
+
+    watchdog_set(5000);
 });

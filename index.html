@@ -173,6 +173,8 @@
   <div id="listener">
     <script>
       var listener = document.getElementById('listener');
+      listener.addEventListener('loadstart', moduleLoading, true);
+      listener.addEventListener('progress', moduleProgress, true);
       listener.addEventListener('load', moduleLoaded, true);
       listener.addEventListener('message', handleMessage, true);
     </script>
