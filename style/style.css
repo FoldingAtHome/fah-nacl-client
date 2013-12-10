@@ -186,7 +186,7 @@ a.button:hover {
 }
 
 #status-image.downloading {
-    background: url('../images/download.gif') no-repeat 3px 3px #64ca7d;
+    background: url('../images/download.gif') no-repeat 3px 7px #64ca7d;
 }
 
 #status-image.waiting {
