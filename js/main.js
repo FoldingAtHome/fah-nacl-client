@@ -116,13 +116,29 @@ function str2ab(str) {
 }
 
 
-function watchdog_timeout() {
-    moduleTimeout();
+// Dialogs *********************************************************************
+function dialog_open(name, closable) {
+    if (typeof closable == 'undefined') closable = true;
+
+    $('#' + name + '-dialog').dialog({
+        modal: true, closeOnEscape: closable, width: 400,
+        open: function(event, ui) {
+            if (!closable)
+                $('.ui-dialog-titlebar-close', $(this).parent()).hide();
+        }});
 }
 
 
-function watchdog_set(t) {
+// Watchdog ********************************************************************
+function watchdog_timeout() {
+    fah.watchdog_call();
+}
+
+
+function watchdog_set(t, call) {
+    fah.watchdog_call = call;
     fah.watchdog_time = t;
+    clearTimeout(fah.watchdog);
     fah.watchdog = setTimeout(watchdog_timeout, t);
 }
 
@@ -166,8 +182,13 @@ function moduleProgress(event) {
 }
 
 
+function moduleLoadFailed() {
+    dialog_open('load-failed', false);
+}
+
+
 function moduleLoaded() {
-    watchdog_kick();
+    watchdog_set(30000, moduleLoadFailed);
 
     debug("NaCl module loaded");
     fah.nacl = document.getElementById('fahcore');
@@ -176,11 +197,7 @@ function moduleLoaded() {
 
 
 function moduleTimeout() {
-    $('#requirements-dialog').dialog({
-        modal: true, closeOnEscape: false, width: 400,
-        open: function(event, ui) {
-            $('.ui-dialog-titlebar-close', $(this).parent()).hide();
-        }});
+    dialog_open('requirements', false);
 }
 
 
@@ -546,5 +563,5 @@ $(function () {
     $('.folding-stop .button').on('click', pause_folding);
     $('.folding-start .button').on('click', unpause_folding);
 
-    watchdog_set(5000);
+    watchdog_set(5000, moduleTimeout);
 });
