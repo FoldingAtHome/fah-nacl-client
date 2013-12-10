@@ -97,7 +97,7 @@ body {
     font-weight: bold;
     background: #fff;
     color: #818d9f;
-    padding: 0.25em 25px;
+    padding: 0.25em 10px 0.25em 25px;
     height: 32px;
     line-height: 32px;
 }
@@ -131,6 +131,10 @@ body {
     border: 1px solid #888;
 }
 
+#menu .button img, #menu .button img:hover {
+    border: 0;
+}
+
 a.button {
     display: inline-block;
     border-radius: 5px;
@@ -140,6 +144,10 @@ a.button {
 
 a.button:hover {
     background: #ddd;
+}
+
+a.desktop.button {
+    color: #42c0fb;
 }
 
 #identity {
@@ -198,7 +206,7 @@ a.button:hover {
 }
 
 #status-image.stopped {
-    background: url('../images/stopped.gif') no-repeat 3px 3px #ff0000;
+    background: url('../images/stopped.png') no-repeat 3px 3px #ff0000;
 }
 
 #status-image.pausing {
@@ -206,7 +214,7 @@ a.button:hover {
 }
 
 #status-image.paused {
-    background: url('../images/paused.gif') no-repeat 3px 3px #fff276;
+    background: url('../images/paused.png') no-repeat 4px 4px #fff276;
 }
 
 #progress {

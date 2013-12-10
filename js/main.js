@@ -131,7 +131,8 @@ function dialog_open(name, closable) {
 
 // Watchdog ********************************************************************
 function watchdog_timeout() {
-    fah.watchdog_call();
+    if (fah.pausing) watchdog_kick();
+    else fah.watchdog_call();
 }
 
 
@@ -145,7 +146,7 @@ function watchdog_set(t, call) {
 
 function watchdog_kick() {
     clearTimeout(fah.watchdog);
-    watchdog_set(fah.watchdog_time);
+    watchdog_set(fah.watchdog_time, fah.watchdog_call);
 }
 
 
@@ -188,12 +189,17 @@ function module_loaded() {
 
     debug("NaCl module loaded");
     fah.nacl = document.getElementById('fahcore');
-    fah.nacl.postMessage('ping');
+    post_message('ping');
 }
 
 
 function module_timeout() {
     dialog_open('requirements', false);
+}
+
+
+function post_message(msg) {
+    if (typeof fah.nacl != 'undefined') fah.nacl.postMessage(msg);
 }
 
 
@@ -248,14 +254,27 @@ function progress_update(current, eta) {
 }
 
 
-function status_set(status, msg) {
-    if (fah.status == status && fah.msg == msg) return;
-    fah.status = status;
-    fah.msg = msg;
+function status_unpause() {
+    var status = fah.status;
+    var msg = fah.msg;
+    fah.status = fah.msg = '';
+    status_set(status, msg);
+}
 
-    $('#status-image').removeClass();
-    $('#status-image').addClass(status);
-    $('#status-text').text(msg);
+
+function status_set(status, msg) {
+    if (status != 'paused') {
+        if (fah.status == status && fah.msg == msg) return;
+
+        fah.status = status;
+        fah.msg = msg;
+    }
+
+    if (!fah.paused) {
+        $('#status-image').removeClass();
+        $('#status-image').addClass(status);
+        $('#status-text').text(msg);
+    }
 }
 
 
@@ -314,6 +333,13 @@ function countdown(delay, call) {
 
 // Network functions ***********************************************************
 function server_call(url, data, success, error) {
+    if (fah.pausing) {
+        folding_paused();
+        setTimeout(function () {server_call(url, data, success, error);}, 250);
+        return;
+
+    } else folding_unpaused();
+
     if (typeof data == 'undefined') data = {};
     data.version = fah.version;
     data.type = 'NACL';
@@ -450,8 +476,8 @@ function start_wu(data) {
 
     status_set('running', 'Starting work unit.');
     progress_start(0);
-    fah.nacl.postMessage(['start', JSON.stringify(wu), data[2], data[3],
-                          fah.as_cert, str2ab(data[4])]);
+    post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
+                  str2ab(data[4])]);
 }
 
 
@@ -506,41 +532,41 @@ function return_cs_error(jqXHR, status, error) {
 
 function folding_unpaused() {
     fah.paused = false;
-    status_set(fah.pause_status, fah.pause_msg);
+    status_unpause();
 }
 
 
 function folding_paused() {
     if (fah.paused) return;
-    fah.paused = true;
-
-    fah.pause_status = fah.status;
-    fah.pause_msg = fah.msg;
 
     status_set('paused', 'Press the start button to continue.');
     $('#eta').text('');
+
+    fah.paused = true;
 }
 
 
 function pause_folding() {
     if (fah.pausing) return;
     fah.pausing = true;
+    $.cookie('fah_paused', true);
 
     $('.folding-stop').hide();
     $('.folding-start').show();
 
-    fah.nacl.postMessage(['pause']);
+    post_message(['pause']);
 }
 
 
 function unpause_folding() {
     if (!fah.pausing) return;
     fah.pausing = false;
+    $.removeCookie('fah_paused');
 
     $('.folding-start').hide();
     $('.folding-stop').show();
 
-    fah.nacl.postMessage(['unpause']);
+    post_message(['unpause']);
 }
 
 
@@ -555,6 +581,8 @@ function load_settings() {
 $(function () {
     // Open all links in new tabs/windows
     $('a').attr('target', '_blank');
+
+    if ($.cookie('fah_paused')) pause_folding();
 
     $('.folding-stop .button').on('click', pause_folding);
     $('.folding-start .button').on('click', unpause_folding);
