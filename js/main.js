@@ -158,8 +158,8 @@ function watchdog_clear() {
 function moduleLoading() {
     watchdog_kick();
     debug("NaCl module loading");
-    status_set('downloading', 'Downloading the Folding@home software to your ' +
-               'browser.  On the first load this can take some time.');
+    status_set('downloading', 'Downloading the Folding@home software in your ' +
+               'Web browser.  On your first visit this can take awhile.');
 }
 
 
