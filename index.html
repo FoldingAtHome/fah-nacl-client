@@ -34,12 +34,13 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
     <script src="js/jquery-1.10.2.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"/>
-    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link rel="stylesheet" href="style/jquery-ui.min.css"/>
+    <script src="js/jquery-ui.min.js"></script>
     <script src="https://apis.google.com/js/plusone.js"></script>
     <script src="js/intercom.min.js"></script>
     <link rel="stylesheet" href="style/style.css"/>
     <script src="js/main.js"></script>
+    <script src="js/bug.js"></script>
   </head>
 
   <body>
@@ -50,44 +51,39 @@
         <span>CONTROL PANEL</span>
         <ul id="menu">
           <li>Share:</li>
-          <li><a href="#" class="email">
-              <img src="images/email.png"/>
-          </a></li>
-          <li><a href="#" class="twitter">
-              <img src="images/twitter.png"/>
-          </a></li>
-          <li><a href="#" class="facebook">
-              <img src="images/facebook.png"/>
-          </a></li>
+          <li><a href="#" class="email"><img src="images/email.png"/></a></li>
+          <li><a href="#" class="twitter"><img src="images/twitter.png"/></a>
+          </li>
+          <li><a href="#" class="facebook"><img src="images/facebook.png"/></a>
+          </li>
           <li><g:plusone href="http://folding.stanford.edu/" size="medium">
           </g:plusone></li>
-
+          <li>|</li>
+          <li><a class="dialog-link button" name="learn" href="#">Learn</a></li>
+          <li><a class="button" href="http://folding.stanford.edu/home/blog"
+                 >News</a></li>
+          <li><a class="dialog-link button" name="help" href="#">Help</a></li>
           <li>|</li>
           <li><a class="desktop button" title="Try our desktop application"
                  href="http://folding.stanford.edu/">Desktop App
               <img src="images/link.png"/>
           </a></li>
-
-          <div style="display:none">
-            <li><a href="#" class="report-bug">
-                <img src="images/report-bug.png"/>
-            </a></li>
-
-            <li><a class="learn button" href="#">Learn</a></li>
-            <li><a class="news button" href="#">News</a></li>
-            <li><a class="help button" href="#">Help</a></li>
-          </div>
         </ul>
       </div>
 
       <div id="identity">
         <p>
           Folding as <input class="user" value="Anonymous"/> for
-          <a href="#">team</a> <input class="team" value="0"/> with
-          <a href="#">passkey</a> <input class="passkey" value=""/>.
-          <br/>
-          You have earned <span class="points">12,345</span> points and
-          your team has earned <span class="team-points">1,234,567</span>
+          <a class="dialog-link" name="team" href="#">team</a>
+          <input class="team" value="0"/> with
+          <a class="dialog-link" name="passkey" href="#">passkey</a>
+          <input class="passkey" value=""/>.
+          <a class="save-id button" title="Save your identity."
+             href="#">Save <img src="images/save.png"/></a>
+        </p>
+        <p>
+          You have earned <span class="points">12,345</span> points.
+          Your team has earned <span class="team-points">1,234,567</span>
           points.
         </p>
       </div>
@@ -120,46 +116,226 @@
       </div>
 
       <div id="project">
-        <h3>You are contributing to project
-          <span class="project">2968</span>.</h3>
-        <p>
-          This project folds a small beta-hairpin peptide, trpzip2. This
-          peptide is a model system that has been studied by many other groups.
-          Here, we aim to simulate the
-          <a href="https://en.wikipedia.org/wiki/Infrared_spectroscopy">IR
-            spectra</a> of trpzip2 as it folds. We are studying this with two
-          different projects: 2968 and 2969, each at different temperatures of
-          300 and 350 Kelvin, respectively.
-        </p>
-        <img style="float:right" src="images/xuhui.jpeg"/>
-        <p>
-          This project is managed by Prof. Xuhui Huang at Hong Kong University
-          of Science and Technology.
-        </p>
-        <p>
-          The main goal of the Huang lab is to understand and manipulate
-          fundamental biological processes associated with conformational
-          changes by developing and applying novel
-          <a class="more" href="#">...more info</a>
-        </p>
+        <h4>You are contributing to project <span class="project">N/A</span>.
+        </h4>
+        <div class="details"></div>
       </div>
-
       <div class="clearfix"></div>
     </div>
     <div id="footer">
-      &copy; 2013. <a href="http://ust.hk/">Hong Kong University Science &amp;
-        Technology</a> and
+      Copyright &copy; 2013. <a href="http://ust.hk/">Hong Kong University
+        Science &amp; Technology</a> and
       <a href="http://stanford.edu/">Stanford University</a>.
     </div>
   </body>
 
   <div id="dialogs">
-    <div id="help-dialog"></div>
-    <div id="learn-dialog"></div>
-    <div id="team-dialog"></div>
-    <div id="user-dialog"></div>
     <div id="points-dialog"></div>
     <div id="project-dialog"></div>
+
+    <div title="Identity not saved" id="invalid-id-dialog">
+      <img class="icon" src="images/error.png"/>
+      <p>We're sorry, the information you entered does not meet our
+        requirements.</p>
+
+      <div class="user">
+        <h4>Unsupported Name</h4>
+        <p>A can contain latin letters, numbers and standard punctuation with
+          no white-space.</p>
+        <p>Leave it blank to fold anonymously.</p>
+      </div>
+
+      <div class="team">
+        <h4>Unsupported Team</h4>
+        <p>Team indentifiers must be whole numbers no more than ten digits
+          long.</p>
+        <p>Enter 0 for no team.</p>
+      </div>
+
+      <div class="passkey">
+        <h4>Unsupported Passkey</h4>
+        <p>
+          Passkeys must be exactly 32 characters long and contain only:
+          0123456789abcdefABCDEF
+        </p>
+        <p>If you do not have a passkey please leave this field blank.</p>
+      </div>
+
+      <p>Nothing was saved.  Please make corrections and try again.</p>
+    </div>
+
+    <div title="Help" id="help-dialog">
+      <p>Sorry if you're having trouble. There are many online resources to help
+        you.
+      </p>
+
+      <h4>FAQ</h4>
+      <p>Start here to find answers to
+        <a href="http://folding.stanford.edu/home/community-support/#faqs"
+           >Frequently Asked Questions</a>.
+      </p>
+
+      <h4>Community Support</h4>
+      <p>The <a href="http://foldingforum.org/">Folding Forum</a> has a very
+        active community of expert folders who would be glad to help you
+        with any problems you might have. It is also a great place to get
+        more involved.
+      </p>
+
+      <h4>Software Bugs</h4>
+      <p>Please <a class="report-bug" href="#">click here
+          <img class="bug-icon" src="images/report-bug.png"/></a> to report bugs.
+      </p>
+
+      <hr/>
+      <p>For more about the science of protein folding and the Folding@home
+        project,
+        <a href="http://folding.stanford.edu/home/the-science/">click here</a>.
+      </p>
+    </div>
+
+    <div id="learn-dialog">
+      <h2>Learn More &amp; Join the Community</h2>
+      <p>Scientists at Stanford University and around the world
+        utilize your donated computer time to better understand and develop cures
+        for some of humanity's worst diseases. Simply by running Folding@home
+        software you are aiding research for Alzheimer's, Huntington's, and many
+        cancers.</p>
+
+      <p>People like you, from all over the globe, currently
+        donate the unused power of over a quarter of a million computers,
+        forming the world's most powerful distributed super-computer.</p>
+
+      <h4>The Science</h4>
+      <p>Proteins help fight disease by first assembling themselves or
+        "folding". When proteins misfold, there can be serious health
+        consequences.</p>
+      <p>If we better understand protein misfolding we can design drugs and
+        therapies to combat these illnesses.</p>
+      <p>See our <a href="http://folding.stanford.edu/home/the-science/"
+                    >Folding Science page</a> and the
+        <a href="http://en.wikipedia.org/wiki/Protein_folding"
+           >Protein Folding Wikipedia page</a>.</p>
+
+      <h4>The Software</h4>
+      <p>Folding@home software aids research by simulating protein folding.
+        The calculations are immense so we break them into small "work units"
+        and pass them to individual computers like yours to solve.</p>
+      <p>Stanford computers assemble data from thousands of work units into
+        meaningful answers to important scientific questions.</p>
+      <p>See the <a href="http://en.wikipedia.org/wiki/Folding@home"
+                    >Folding@home Wikipedia page</a>.</p>
+
+      <h4>Get Involved</h4>
+      <p>One of the best ways to help Folding@home is by recruiting your
+        friends and family. Start by sharing our project with them.</p>
+      <p>Then <a href="http://folding.stanford.edu/home/teams-stats/"
+                 >join a team</a> or even
+        <a href="http://fah-web.stanford.edu/cgi-bin/createteam.pl"
+           >start your own team</a>. The more points you and your team earn, the
+        closer we come to finding cures.</p>
+      <p>Our non-profit organization also accepts
+        <a href="http://folding.stanford.edu/home/donate/">donations</a>.
+      </p>
+    </div>
+
+    <div title="Fold with a team" id="team-dialog">
+      <p>Join a folding team and compete against other teams for points.</p>
+
+      <p>If you have joined a team you should enter your team number above.
+        Then the points you earn to be added to your team's total.</p>
+
+      <ul>
+        <li><a href="http://folding.stanford.edu/home/teams-stats/"
+               >Team Stats Page</a>.</li>
+      </ul>
+    </div>
+
+    <div title="Lock in your identity" id="passkey-dialog">
+      <p>A passkey is a unique identifier which you can use to track your
+        individual points.  It will also allow you to earn bonus points.
+      </p>
+
+      <p>Folding@home allows anyone to use any valid name to identify themselves.
+        This means that if you choose a common name there are likely other people
+        using it as well.</p>
+
+      <ul>
+        <li><a href="http://fah-web.stanford.edu/cgi-bin/getpasskey.py"
+           >Get a Passkey</a></li>
+        <li><a href="http://folding.stanford.edu/home/faq/faq-passkey/"
+           >Passkey FAQ</a>.</li>
+      </ul>
+    </div>
+
+    <div id="bug-submission-dialog"
+         title="Submitting Bug Report. Please wait. . .">
+      <img src="images/report-bug.png"/>
+      <iframe id="bug-iframe" name="bug-iframe"></iframe>
+    </div>
+
+    <div id="bug-dialog" title="Submit a Bug Report">
+      <img src="images/report-bug.png"/>
+      <form method="post" target="bug-iframe"
+            action="http://folding.stanford.edu/bugreport.php">
+        <table>
+          <tr><th>Name:</th><td class="user"></td>
+            <input name="user" hidden="true"/>
+          </tr>
+          <tr>
+            <th>Team:</th> <td class="team"></td>
+            <input name="team" hidden="true"/>
+          </tr>
+          <tr>
+            <th>Category:</th>
+            <td>
+              <select name="category">
+                <option value="choose" selected>-- Please choose --</option>
+                <option value="conectivity">Connectivity issue</option>
+                <option value="documentation">Documentation error</option>
+                <option value="enhancement">Enhancement request</option>
+                <option value="overuse">Resources overutilized</option>
+                <option value="underuse">Resources underutilized</option>
+                <option value="cosmetic">Cosmetic defect</option>
+              </select>
+          </td></tr>
+          <tr class="description">
+            <td colspan="2"><b>Please provide a brief description:</b>
+              <textarea name="description" rows="4" maxlength="1024"
+                        ></textarea>
+            </td>
+          </tr>
+        </table>
+        <input name="ts" type="hidden"/>
+        <input name="client" type="hidden" value="nacl"/>
+      </form>
+      <div id="bug-disclaimer">
+        <p>
+          <b>Disclaimer:</b> When you submit this form your
+          Folding@home user name, team, all or portions of the log
+          files produced by the Folding@home software and all the
+          information you provide in this form will be stored
+          indefinitely on servers at Stanford University.  Your IP
+          address will be logged but not made public.  <b>Do not
+            include passwords, copyrighted material or any other
+            information which you do not want to be made public.
+          </b>
+        </p>
+        <p>
+          By submitting this form you acknowledge that you are
+          making said information publicly available on the Internet
+          and agree to let Stanford, it's partners and members of
+          foldingforum.org use said information for the purpose of
+          improving the Folding@home software.  The collected
+          information will not be used for advertising or tracking
+          your activity.  If you do not agree with these terms
+          please do not submit this forum and instead press the
+          Cancel button now.
+        </p>
+      </div>
+      <p>To see a list of bug reports submitted from this IP address click
+        <a href="http://folding.stanford.edu/bugreport.php">here</a>.</p>
+    </div>
 
     <div title="Failed to load software" id="load-failed">
       <img class="icon" src="images/error.png"/>
@@ -167,12 +343,49 @@
         reload the page to make another attempt.</p>
     </div>
 
-    <div title="Missing Requirements" id="requirements-dialog">
+    <div title="Oh, no!" id="nacl-error-dialog">
       <img class="icon" src="images/error.png"/>
 
-      This Folding@home client requires Native Client (NaCl).
-      Generally this means you need to install
-      <a href="http://google.com/chrome/">Google Chrome</a>.
+      We're sorry, we could not load Folding@home in your browser.
+
+      <ol>
+        <li>Are you using the Google Chrome browser version 31 or newer?
+          <p>This Folding@home Web App requires Google Native Client which is
+          provided by the <a href="http://google.com/chrome/">Google Chrome
+              browser</a>.  You can check to see if you have version 31 or
+          better by typing <tt>chrome://version</tt> in to your address bar.</p>
+        </li>
+
+        <li>Have you enabled NaCl?
+          <p>Currently you must enable Native Client manually by typing
+            <tt>chrome://flags/#enable-nacl</tt> into the Chrome address bar
+            and clicking <b>Enable</b>.  If it says <b>Disable</b> that means
+            Native Client is already enabled.</p>
+        </li>
+
+        <li>Is NaCl debugging <em>disabled</em>?
+          <p>Native Client debugging is disabled by default but if it is enabled
+            it will inhibit our software from running.  To ensure debugging is
+            disabled, type <tt>chrome://flags/#enable-nacl-debug</tt> into the
+            Chrome address bar check the setting.</p>
+        </li>
+
+        <li>After making changes did you restarted your browser?
+          <p>To make changes to the NaCl settings take effect, choose <b>Quit</b>
+            from your browser menu and start again.</p>
+        </li>
+
+        <li>Are you connected to the Internet?
+          <p>You must be connected to the Internet to run Folding@home.  Our
+            software downloads problems to work on from scientific institutions
+            around the world and uploads solutions found by your computer which
+            help scientists fight disease.</p>
+        </li>
+      </ol>
+
+      Or try our
+      <a class="desktop" href="http://folding.stanford.edu">Desktop App
+        <img width="16" src="images/link.png"/></a>.
     </div>
   </div>
   <div id="overlay"></div>

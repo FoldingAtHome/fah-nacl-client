@@ -29,15 +29,18 @@ var fah = {
     user: 'Anonymous',
     team: 0,
 
+    as_url: 'http://fah.stanford.edu:8080',
     stats_url: 'http://folding.stanford.edu/stats.py',
     project_url: 'http://folding.stanford.edu/project-jsonp.py',
-    as_url: 'http://fah.stanford.edu:8080',
 
+    max_project_brief: 600, // Maximum brief project description length
     min_delay: 15,
     max_delay: 15 * 60,
 
     pausing: false,
     paused: false,
+
+    projects: {},
 
     last: null
 };
@@ -121,12 +124,22 @@ function str2ab(str) {
 function dialog_open(name, closable) {
     if (typeof closable == 'undefined') closable = true;
 
-    $('#' + name + '-dialog').dialog({
-        modal: true, closeOnEscape: closable, width: 400,
+    var div = $('#' + name + '-dialog');
+    var width = div.css('width');
+    if (typeof width == 'undefined' || width == '0px') width = '500px';
+
+    div.dialog({
+        modal: true, closeOnEscape: closable, width: width,
         open: function(event, ui) {
             if (!closable)
                 $('.ui-dialog-titlebar-close', $(this).parent()).hide();
         }});
+}
+
+
+function dialog_open_event(e) {
+    dialog_open($(this).attr('name'));
+    e.preventDefault();
 }
 
 
@@ -195,7 +208,7 @@ function module_loaded() {
 
 
 function module_timeout() {
-    dialog_open('requirements', false);
+    dialog_open('nacl-error', false);
 }
 
 
@@ -231,17 +244,74 @@ function module_error(event) {
 
 
 // Projects *********************************************************************
-function project_set(id) {
+function project_show(id) {
+    if (id in fah.projects) {
+        $('#project .details').html(fah.projects[id].brief);
+        $('#project .details').find('a').attr('target', '_blank');
+    }
+}
+
+
+function project_details(id) {
+    $('#project-dialog').html(fah.projects[id].details);
+    dialog_open('project');
 }
 
 
 function project_update(data) {
-    if (data[0] != 'project') ;
+    if (data.length != 2 || data[0] != 'project') {
+        debug("Unexpected project response:", data);
+        return;
+    }
+
+    var p = data[1];
+
+    var brief;
+    var details;
+
+    if (typeof p.error != 'undefined')
+        brief = details = '<strong>' + p.error + '</strong>';
+
+    else {
+        // Shorten brief description if necessary
+        var desc;
+        if (fah.max_project_brief - 3 < p.pdesc.length)
+            desc = p.pdesc.substr(0, fah.max_project_brief - 3) + '...';
+        else desc = p.pdesc;
+
+        brief = desc + ' <a href="javascript:void(0)" ' +
+            'onclick="project_details(' + p.id + '); return false;">' +
+            'Learn more</a>';
+
+        details = '<h2>Project ' + p.id + '</h2>' +
+            (typeof p.pthumb != 'undefined' && p.pthumb != '' ?
+             ('<img src="data:;base64, ' + p.pthumb + '"/>') : '') +
+            '<p>Disease Type: ' + p.disease + '</p>' + p.pdesc + '<br/>' +
+            '<strong>This project is managed by ' + p.name + ' at ' + p.uni +
+            '.</strong>' + (p.url != '' ? ('<p>URL: <a href="' + p.url + '">' +
+                                           p.url + '</a></p>') : '') +
+            (p.mthumb != '' ?
+             ('<div><img src="data:;base64, ' + p.mthumb + '"/></div>') : '') +
+            p.mdesc + '</div>';
+    }
+
+    fah.projects[p.id] = {brief: brief, details: details};
+
+    if (p.id == fah.project) project_show(p.id);
 }
 
 
 function project_load(id) {
-    if (!id || fah.projects[id]) return;
+    if (!id) return;
+
+    if (id in fah.projects) {
+        project_show(id);
+        return;
+    }
+
+    $('span.project').text(id);
+    $('#project .details').html(
+        '<a href="#" onclick="project_load(' + id + ')">Loading details...</a>');
 
     $.ajax({
         url: fah.project_url,
@@ -482,7 +552,7 @@ function request_wu(data) {
     var assign = data[1];
     debug('WS:', assign);
     fah.ws = assign.ws;
-    fah.project = assign.project;
+    project_load(fah.project = assign.project);
     fah.as_cert = data[3];
 
     status_set('downloading', 'Requesting a work unit.');
@@ -600,22 +670,113 @@ function unpause_folding() {
 }
 
 
-// Init ************************************************************************
-function load_settings() {
-    fah.user = $.cookie('fah_user');
-    fah.team = $.cookie('fah_team');
-    fah.passkey = $.cookie('fah_passkey');
+// Identity *********************************************************************
+function load_identity() {
+    if ($.cookie('fah_user'))
+        $('input.user').val(fah.user = $.cookie('fah_user'));
+
+    if ($.cookie('fah_team'))
+        $('input.team').val(fah.team = $.cookie('fah_team'));
+
+    if ($.cookie('fah_passkey'))
+        $('input.passkey').val(fah.passkey = $.cookie('fah_passkey'));
 }
 
 
+function save_identity(e) {
+    if (typeof e != 'undefined') e.preventDefault();
+
+    var errors = []
+
+    var user = $('input.user').val().trim();
+    if (user == '') user = 'Anonymous';
+    if (!/^[!-~]+$/.test(user)) errors.push('user');
+
+    var team = $('input.team').val().trim();
+    if (!/^\d{1,10}$/.test(team) || $.isNumeric(team) == false)
+        errors.push('team');
+
+    var passkey = $('input.passkey').val().trim();
+    if (passkey != '' && !/^[a-fA-F0-9]{32}$/.test(passkey))
+        errors.push('passkey');
+
+    if (errors.length) {
+        $('#invalid-id-dialog div').css({display: 'none'});
+
+        for (var i = 0; i < errors.length; i++)
+            $('#invalid-id-dialog .' + errors[i]).css({display: 'block'});
+
+        dialog_open('invalid-id');
+
+    } else {
+        $.cookie('fah_user', fah.user = user);
+        $.cookie('fah_team', fah.team = team);
+        $.cookie('fah_passkey', fah.passkey = passkey);
+
+        debug('Identity saved');
+    }
+}
+
+
+// Init ************************************************************************
 $(function () {
-    // Open all links in new tabs/windows
+    watchdog_set(5000, module_timeout);
+
+    // Use local AS for development
+    if (document.location.host == 'localhost')
+        fah.as_url = 'http://localhost:8888';
+    else if (document.location.host == '127.0.0.1')
+        fah.as_url = 'http://127.0.0.1:8888';
+
+    // Open all links in new tab
     $('a').attr('target', '_blank');
 
+    // Restore state
     if ($.cookie('fah_paused')) pause_folding();
+    load_identity();
 
+    // Start stop button
     $('.folding-stop .button').on('click', pause_folding);
     $('.folding-start .button').on('click', unpause_folding);
+    $('#nacl-error-dialog li').click(function () {
+        $(this).find('p').slideToggle();
+    });
 
-    watchdog_set(5000, module_timeout);
+    // Dialogs
+    $('a.dialog-link').click(dialog_open_event);
+
+    // Save identity
+    $('.save-id').click(save_identity);
+
+    // Enable Bug Reporting
+    $('.report-bug').on('click', function(e) {
+        e.preventDefault();
+        bug_report();
+    });
+
+    // Share Links
+    var subject = 'Our unused computer power can help find a cure.';
+    var body = 'Here is a site where we can share our unused computer power ' +
+        'to help Stanford University professors find cures for diseases like ' +
+        'Alzheimer\'s, Cancer, and Parkinson\'s. It only takes about 5 ' +
+        'minutes to join the cause.\n\n Click here to watch the video: ' +
+        'http://folding.stanford.edu';
+
+    $('a.email').attr({
+        href:
+        'mailto:?subject=' + subject + '&body=' + body.replace('\n', '%0A'),
+        rel: 'nofollow',
+        title: 'Click here to open your email and send this message to your ' +
+            'friends:\n\n---------------------------------------------------' +
+            '-----------------------------------------------\nSubject: ' +
+            subject + '\n\n' + body
+    });
+
+    var share_url = 'http%3A%2F%2Ffolding.stanford.edu';
+    var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';
+
+    $('a.twitter').attr({href: 'https://twitter.com/share?url=' + share_url +
+                         '&text=' + share_text});
+    $('a.facebook').attr({href: 'http://www.facebook.com/sharer.php?u=' +
+                          share_url + '&t=' + share_text});
 });

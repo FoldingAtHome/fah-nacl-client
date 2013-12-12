@@ -54,7 +54,7 @@ a:hover {
 }
 
 p {
-    padding: 10px 0;
+    padding: 1em 0;
 }
 
 .clearfix {
@@ -146,21 +146,33 @@ a.button:hover {
     background: #ddd;
 }
 
-a.desktop.button {
+a.desktop {
     color: #42c0fb;
 }
 
 #identity {
-    padding: 0.25em 25px;
+    padding: 0.5em 25px;
     width: 850px;
 }
 
-#identity input {
-    width: 10em;
+#identity p {
+    padding: 0.25em 0;
+}
+
+#identity input.user {
+    width: 16em;
+}
+
+#identity input.team {
+    width: 5em;
+}
+
+#identity input.passkey {
+    width: 17em;
 }
 
 .points {
-    font-size: 250%;
+    font-size: 150%;
     font-weight: 900;
     color: #fb6436;
 }
@@ -206,7 +218,7 @@ a.desktop.button {
 }
 
 #status-image.stopped {
-    background: url('../images/stopped.png') no-repeat 3px 3px #ff0000;
+    background: url('../images/stopped.png') no-repeat 4px 5px #ff0000;
 }
 
 #status-image.pausing {
@@ -287,21 +299,115 @@ a.desktop.button {
     float: right;
 }
 
+#project .details {
+    margin-top: 1em;
+}
+
 #dialogs {
     display: none;
 }
 
 .ui-dialog ul, .ui-dialog ol {
-    margin: 1em;
+    margin: 1em 2em;
 }
 
 .ui-dialog li {
-    margin: 0 1em;
+    margin: 0.5em 1em 0.5em 0.25em;
+}
+
+.ui-dialog h1, .ui-dialog h2, .ui-dialog h3 {
+    margin: 0.5em 0;
+}
+
+#invalid-id-dialog {
+    width: 500px;
+    font-size: 90%;
+}
+
+#invalid-id-dialog p {
+    padding: 0.25em;
+}
+
+#invalid-id-dialog div {
+    background: #eee;
+    border-radius: 10px;
+    padding: 0.25em 0.5em;
+    margin: 0.5em 0;
+}
+
+#bug-dialog {
+    text-align: left;
+}
+
+#bug-dialog img, #bug-submitting-dialog img {
+    float: right;
+    width: 64px;
+    margin-bottom: -64px;
+}
+
+#bug-dialog table, #bug-dialog td, #bug-dialog textarea {
+    width: 100%;
+}
+
+#bug-dialog td {
+    padding: 5px;
+}
+
+#bug-dialog textarea {
+    font-size: 80%;
+}
+
+#bug-dialog p {
+    font-size: 80%;
+}
+
+#bug-disclaimer {
+    font-size: 90%;
+}
+
+#bug-iframe {
+    width: 400px;
+    height: 100px;
+    border: 0;
+}
+
+.input-warn {
+    border: 3px solid red;
+}
+
+#nacl-error-dialog {
+    width: 45em;
+}
+
+#nacl-error-dialog li {
+    padding: 0.25em;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+#nacl-error-dialog li:hover {
+    background: #eee;
+    cursor: pointer;
+}
+
+#nacl-error-dialog li p {
+    margin: 0.5em 0;
+    padding: 0 0.5em;
+    display: none;
+}
+
+#learn-dialog {
+    width: 80%;
 }
 
 #fahcore {
     width: 0;
     height: 0;
+}
+
+img.bug-icon {
+    width: 24px;
+    vertical-align: middle;
 }
 
 img.icon {
