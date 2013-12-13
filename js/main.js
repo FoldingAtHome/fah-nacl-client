@@ -918,23 +918,6 @@ $(function () {
     });
 
     // Share Links
-    var subject = 'Our unused computer power can help find a cure.';
-    var body = 'Here is a site where we can share our unused computer power ' +
-        'to help Stanford University professors find cures for diseases like ' +
-        'Alzheimer\'s, Cancer, and Parkinson\'s. It only takes about 5 ' +
-        'minutes to join the cause.\n\n Click here to watch the video: ' +
-        'http://folding.stanford.edu';
-
-    $('a.email').attr({
-        href:
-        'mailto:?subject=' + subject + '&body=' + body.replace('\n', '%0A'),
-        rel: 'nofollow',
-        title: 'Click here to open your email and send this message to your ' +
-            'friends:\n\n---------------------------------------------------' +
-            '-----------------------------------------------\nSubject: ' +
-            subject + '\n\n' + body
-    });
-
     var share_url = 'http%3A%2F%2Ffolding.stanford.edu';
     var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';
 
