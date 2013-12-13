@@ -135,9 +135,13 @@ function dialog_open(name, closable) {
     if (typeof width == 'undefined' || width == '0px') width = '500px';
     fah.dialog_widths[name] = width;
 
+    var buttons;
+    if (closable)
+        buttons = [{text: 'Ok', click: function () {$(this).dialog('close');}}];
+
     div.dialog({
         modal: true, closeOnEscape: closable, width: width,
-        buttons: [{text: 'Ok', click: function () {$(this).dialog('close');}}],
+        buttons: buttons,
         open: function(event, ui) {
             if (!closable)
                 $('.ui-dialog-titlebar-close', $(this).parent()).hide();
