@@ -171,7 +171,7 @@ a.desktop {
     width: 17em;
 }
 
-.points {
+.user-points {
     font-size: 150%;
     font-weight: 900;
     color: #fb6436;
@@ -299,8 +299,25 @@ a.desktop {
     float: right;
 }
 
-#project .details {
+#project .brief {
     margin-top: 1em;
+}
+
+.brief .project .pthumb {
+    max-width: 200px;
+}
+
+.project .pthumb {
+    float: right;
+    margin: 0.5em;
+    margin-right: 0;
+    border-radius: 5px;
+}
+
+.project .mthumb {
+    float: left;
+    margin: 1em;
+    margin-left: 0;
 }
 
 #dialogs {
@@ -317,6 +334,16 @@ a.desktop {
 
 .ui-dialog h1, .ui-dialog h2, .ui-dialog h3 {
     margin: 0.5em 0;
+}
+
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+    float: none;
+    width: 4em;
+    margin: auto;
+}
+
+.ui-widget-content a {
+    color: #8e0028;
 }
 
 #invalid-id-dialog {
@@ -400,6 +427,11 @@ a.desktop {
     width: 80%;
 }
 
+#project-dialog {
+    width: 60em;
+    font-size: 12pt;
+}
+
 #fahcore {
     width: 0;
     height: 0;
@@ -421,9 +453,10 @@ img.icon {
 }
 
 #footer {
-    width: 440px;
-    margin: 1em auto;
+    width: 900px;
+    margin: 0.25em auto;
+    text-align: center;
     font-weight: normal;
-    color: #444;
+    color: #222;
     font-size: 80%;
 }

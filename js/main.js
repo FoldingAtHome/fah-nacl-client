@@ -40,7 +40,14 @@ var fah = {
     pausing: false,
     paused: false,
 
+    last_stats: 0,
+    last_progress_time: 0,
+    last_progress_count: 0,
+    progress_stablize: 0,
+    eta: [],
+
     projects: {},
+    dialog_widths: {},
 
     last: null
 };
@@ -89,12 +96,10 @@ function human_time(t) {
 }
 
 
-function have_local_storage() {
-    try {
-        return 'localStorage' in window && window['localStorage'] !== null;
-    } catch (e) {
-        return false;
-    }
+function human_number(x) {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
 }
 
 
@@ -125,11 +130,14 @@ function dialog_open(name, closable) {
     if (typeof closable == 'undefined') closable = true;
 
     var div = $('#' + name + '-dialog');
-    var width = div.css('width');
+    var width = fah.dialog_widths[name];
+    if (typeof width == 'undefined') width = div.css('width');
     if (typeof width == 'undefined' || width == '0px') width = '500px';
+    fah.dialog_widths[name] = width;
 
     div.dialog({
         modal: true, closeOnEscape: closable, width: width,
+        buttons: [{text: 'Ok', click: function () {$(this).dialog('close');}}],
         open: function(event, ui) {
             if (!closable)
                 $('.ui-dialog-titlebar-close', $(this).parent()).hide();
@@ -243,34 +251,126 @@ function module_error(event) {
 }
 
 
-// Projects *********************************************************************
-function project_show(id) {
-    if (id in fah.projects) {
-        $('#project .details').html(fah.projects[id].brief);
-        $('#project .details').find('a').attr('target', '_blank');
+/**************************** Stats functions *********************************/
+function stats_load() {
+    if (fah.user.toLowerCase() == 'anonymous' && fah.team == 0) {
+        $('#points').text('Choose a name and earn points. ' +
+                          'Join a team and compete for fun.');
+        return;
     }
+
+    /*
+    var now = new Date().valueOf();
+    if (now < fah.last_stats + 60 * 15 * 1000 ||
+        fah.user == null || fah.team == null) return;
+    fah.last_stats = now;
+    */
+
+    $.ajax({
+        url: fah.stats_url,
+        type: 'GET',
+        data: {'user': fah.user, 'team': fah.team, 'passkey': fah.passkey,
+               'version': fah.version},
+        cache: false,
+        dataType: 'jsonp',
+        success: stats_update
+    });
+}
+
+
+function stats_update(data) {
+    if (data[0].length != 2 || data[0][0] != 'stats') {
+        debug("Unexpected stats response:", data);
+        return;
+    }
+    var stats = data[0][1];
+    debug('stats:', stats);
+
+    var user = $('<span>');
+    var team = $('<team>');
+
+    if (fah.user.toLowerCase() == 'anonymous')
+        user.append('Choose a name and earn points.');
+
+    else {
+        $('<a>')
+            .attr({href: stats.url, target: '_blank'})
+            .text('You')
+            .appendTo(user);
+
+        user.append(' have earned ');
+
+        $('<span>')
+            .addClass('user-points')
+            .text(human_number(stats.earned))
+            .appendTo(user);
+
+        user.append(' points.');
+    }
+
+    if (fah.team == 0) team.append('Consider joining a team.');
+    else {
+        var team_name;
+        if (typeof stats.team_url != 'undefined') {
+            var url = stats.team_url;
+            if (!/^https?:\/\//.test(url)) url = 'http://' + url;
+            team_name = $('<a>').attr({target: '_blank', href: url});
+
+        } else team_name = $('<span>');
+
+        team_name.append('Your team');
+
+        if (stats.team_name)
+            team_name.append(', "').append(stats.team_name).append('", ');
+
+        team.append(team_name);
+
+        team.append(' has earned ');
+
+        $('<span>')
+            .addClass('team-points')
+            .text(human_number(stats.team_total))
+            .appendTo(team);
+
+        team.append(' points.');
+    }
+
+    $('#points').html(user).append(' ').append(team);
+}
+
+
+// Projects ********************************************************************
+function project_show(id) {
+    if (id in fah.projects)
+        $('#project .brief')
+            .html(fah.projects[id].brief)
+            .find('a').attr('target', '_blank');
 }
 
 
 function project_details(id) {
-    $('#project-dialog').html(fah.projects[id].details);
+    $('#project-dialog')
+        .attr('title', 'Project: ' + id)
+        .html(fah.projects[id].details)
+        .find('a').attr('target', '_blank');
+
     dialog_open('project');
 }
 
 
 function project_update(data) {
-    if (data.length != 2 || data[0] != 'project') {
+    if (data[0].length != 2 || data[0][0] != 'project') {
         debug("Unexpected project response:", data);
         return;
     }
 
-    var p = data[1];
+    var p = data[0][1];
 
     var brief;
     var details;
 
     if (typeof p.error != 'undefined')
-        brief = details = '<strong>' + p.error + '</strong>';
+        brief = details = '<em>' + p.error + '</em>';
 
     else {
         // Shorten brief description if necessary
@@ -279,20 +379,39 @@ function project_update(data) {
             desc = p.pdesc.substr(0, fah.max_project_brief - 3) + '...';
         else desc = p.pdesc;
 
-        brief = desc + ' <a href="javascript:void(0)" ' +
-            'onclick="project_details(' + p.id + '); return false;">' +
-            'Learn more</a>';
+        // Thumb
+        var thumb;
+        if (typeof p.pthumb != 'undefined')
+            thumb = $('<img>')
+            .attr('src', 'data:;base64, ' + p.pthumb)
+            .addClass('pthumb');
 
-        details = '<h2>Project ' + p.id + '</h2>' +
-            (typeof p.pthumb != 'undefined' && p.pthumb != '' ?
-             ('<img src="data:;base64, ' + p.pthumb + '"/>') : '') +
-            '<p>Disease Type: ' + p.disease + '</p>' + p.pdesc + '<br/>' +
-            '<strong>This project is managed by ' + p.name + ' at ' + p.uni +
-            '.</strong>' + (p.url != '' ? ('<p>URL: <a href="' + p.url + '">' +
-                                           p.url + '</a></p>') : '') +
-            (p.mthumb != '' ?
-             ('<div><img src="data:;base64, ' + p.mthumb + '"/></div>') : '') +
-            p.mdesc + '</div>';
+        // Brief
+        brief = $('<div>').addClass('project');
+        if (thumb) brief.append(thumb);
+        $('<p>').html(desc)
+            .append($('<a>')
+                    .attr({href: 'javascript:void()',
+                           onclick: 'project_details(' + p.id +
+                           '); return false;'})
+                    .text('Learn more'))
+            .appendTo(brief);
+
+        // Details
+        details = $('<div>').addClass('project details');
+        if (thumb) details.append(thumb.clone());
+        $('<p>').text('Disease Type: ' + p.disease).appendTo(details);
+        details.append(p.pdesc);
+        details.append('<br>');
+        $('<em>').text('Project managed by ' + p.name + ' at ' + p.uni + '.')
+            .appendTo(details);
+        if (p.url != '') $('<p>').append('URL: ')
+            .append($('<a>').attr('href', p.url).text(p.url)).appendTo(details);
+        if (p.mthumb != '')
+            $('<div>').addClass('mthumb')
+            .append($('<img>').attr('src', 'data:;base64, ' + p.mthumb))
+            .appendTo(details);
+        details.append(p.mdesc);
     }
 
     fah.projects[p.id] = {brief: brief, details: details};
@@ -310,8 +429,9 @@ function project_load(id) {
     }
 
     $('span.project').text(id);
-    $('#project .details').html(
-        '<a href="#" onclick="project_load(' + id + ')">Loading details...</a>');
+    $('#project .brief').html(
+        '<a href="#" onclick="project_load(' + id +
+            ')">Loading details...</a>');
 
     $.ajax({
         url: fah.project_url,
@@ -325,19 +445,57 @@ function project_load(id) {
 
 
 // UI Status *******************************************************************
-function progress_start(total) {
-    fah.progress_total = total;
-    $('#progress div').css({width: 0}).text('0.0%');
+function eta_reset(clear) {
+    if (typeof clear == 'undefined' || clear) fah.eta = 0;
     $('#eta').text('');
+    fah.last_progress_time = 0;
+    fah.last_progress_count = 0;
+    fah.progress_stablize = 0;
 }
 
 
-function progress_update(current, eta) {
+function eta_update(count) {
+    var eta = 0;
+    var now = new Date().valueOf();
+    var delta = count - fah.last_progress_count;
+
+    if (0 < delta && fah.last_progress_time) {
+        var sample = (now - fah.last_progress_time) / delta;
+        //if (fah.eta.length == 10) fah.eta.shift();
+        //fah.eta.push(sample);
+        fah.eta = sample = fah.eta ? fah.eta * 0.99 + sample * 0.01 : sample;
+
+        /*sample = 0;
+        for (var i = 0; i < fah.eta.length; i++) sample += fah.eta[i];
+        sample /= fah.eta.length;*/
+
+        if (0 < sample) eta = (fah.progress_total - count) * sample / 1000.0;
+    }
+
+    if (fah.progress_stablize && fah.progress_stablize - 0.9 < eta &&
+        eta < fah.progress_stablize + 0.9) eta = fah.progress_stablize;
+    else fah.progress_stablize = eta;
+
+    if (delta) fah.last_progress_time = now;
+    fah.last_progress_count = count;
+
+    return eta;
+}
+
+
+function progress_start(total) {
+    fah.progress_total = total;
+    $('#progress div').css({width: 0}).text('0.0%');
+    eta_reset();
+}
+
+
+function progress_update(current) {
     if (fah.pausing) {
         $('#progress div')
             .css({width: '100%', 'text-align': 'center', background: '#fff276'})
             .text('Paused');
-        $('#eta').text('');
+        eta_reset(false);
         return;
     }
 
@@ -346,10 +504,11 @@ function progress_update(current, eta) {
         .css({width: percent, 'text-align': 'right', background: '#7a97c2'})
         .text(percent);
 
-    if (typeof eta != 'undefined')
+    var eta = Math.floor(eta_update(current));
+    if (eta)
         $('#eta')
         .text('The current operation will complete in about ' +
-              human_time(Math.floor(eta)));
+              human_time(eta));
     else $('#eta').text('');
 }
 
@@ -596,6 +755,7 @@ function finish_wu(results, signature, data) {
     fah.data = data;
     return_ws();
     backoff_reset('ws');
+    stats_load();
 }
 
 
@@ -640,7 +800,7 @@ function folding_paused() {
     if (fah.paused) return;
 
     status_set('paused', 'Press the start button to continue.');
-    $('#eta').text('');
+    eta_reset(false);
 
     fah.paused = true;
 }
@@ -670,7 +830,7 @@ function unpause_folding() {
 }
 
 
-// Identity *********************************************************************
+// Identity ********************************************************************
 function load_identity() {
     if ($.cookie('fah_user'))
         $('input.user').val(fah.user = $.cookie('fah_user'));
@@ -680,6 +840,8 @@ function load_identity() {
 
     if ($.cookie('fah_passkey'))
         $('input.passkey').val(fah.passkey = $.cookie('fah_passkey'));
+
+    stats_load();
 }
 
 
@@ -714,6 +876,7 @@ function save_identity(e) {
         $.cookie('fah_passkey', fah.passkey = passkey);
 
         debug('Identity saved');
+        stats_load();
     }
 }
 
