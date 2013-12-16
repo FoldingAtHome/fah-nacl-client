@@ -92,6 +92,16 @@
 
         <p id="eta"></p>
 
+        <div id="power-slider">
+          <span>Folding Power</span>
+          <div id="slider"></div>
+          <ul>
+            <li class="label-1">Light</li>
+            <li class="label-2">Medium</li>
+            <li class="label-3">Full</li>
+          </ul>
+        </div>
+
         <div class="folding-start">
           <div class="button">Start Folding</div>
           <p>
@@ -252,9 +262,9 @@
         individual points.  It will also allow you to earn bonus points.
       </p>
 
-      <p>Folding@home allows anyone to use any valid name to identify themselves.
-        This means that if you choose a common name there are likely other people
-        using it as well.</p>
+      <p>Folding@home allows anyone to use any valid name to identify
+        themselves. This means that if you choose a common name there are
+        likely other people using it as well.</p>
 
       <ul>
         <li><a href="http://fah-web.stanford.edu/cgi-bin/getpasskey.py"
@@ -367,8 +377,8 @@
         </li>
 
         <li>After making changes did you restarted your browser?
-          <p>To make changes to the NaCl settings take effect, choose <b>Quit</b>
-            from your browser menu and start again.</p>
+          <p>To make changes to the NaCl settings take effect, choose
+            <b>Quit</b> from your browser menu and start again.</p>
         </li>
 
         <li>Are you connected to the Internet?
@@ -393,6 +403,7 @@
       listener.addEventListener('load', module_loaded, true);
       listener.addEventListener('message', handle_message, true);
       listener.addEventListener('error', module_error, true);
+      listener.addEventListener('crash', module_exit, true);
     </script>
     <embed id="fahcore" src="fahcore_b0.nmf" type="application/x-nacl"/>
   </div>

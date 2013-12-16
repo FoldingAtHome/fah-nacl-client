@@ -219,6 +219,12 @@ function module_loaded() {
 }
 
 
+function module_exit() {
+    debug('Module exit');
+    $('#listener').html($('#listener').clone());
+}
+
+
 function module_timeout() {
     dialog_open('nacl-error', false);
 }
@@ -239,6 +245,7 @@ function handle_message(event) {
         init(); // Start client
         break;
 
+    case cmd == 'threads': fah.threads = event.data[1]; break;
     case cmd == 'step': step_wu(event.data[1], event.data[2]); break;
     case cmd == 'results':
         finish_wu(event.data[1], event.data[2], event.data[3]);
@@ -262,13 +269,6 @@ function stats_load() {
                           'Join a team and compete for fun.');
         return;
     }
-
-    /*
-    var now = new Date().valueOf();
-    if (now < fah.last_stats + 60 * 15 * 1000 ||
-        fah.user == null || fah.team == null) return;
-    fah.last_stats = now;
-    */
 
     $.ajax({
         url: fah.stats_url,
@@ -465,14 +465,7 @@ function eta_update(count) {
 
     if (0 < delta && fah.last_progress_time) {
         var sample = (now - fah.last_progress_time) / delta;
-        //if (fah.eta.length == 10) fah.eta.shift();
-        //fah.eta.push(sample);
-        fah.eta = sample = fah.eta ? fah.eta * 0.99 + sample * 0.01 : sample;
-
-        /*sample = 0;
-        for (var i = 0; i < fah.eta.length; i++) sample += fah.eta[i];
-        sample /= fah.eta.length;*/
-
+        fah.eta = sample = fah.eta ? fah.eta * 0.98 + sample * 0.02 : sample;
         if (0 < sample) eta = (fah.progress_total - count) * sample / 1000.0;
     }
 
@@ -484,6 +477,45 @@ function eta_update(count) {
     fah.last_progress_count = count;
 
     return eta;
+}
+
+
+function power_init() {
+    var slider = $('#slider');
+    slider.slider({
+        min: 1, max: 3, range: "min", value: 1,
+        slide: function(event, ui) {
+            var margin = {1: -2, 2: -12, 3: -24}[ui.value];
+            slider.find(".ui-slider-handle").css({"margin-left": margin});
+        },
+        stop: function(e, ui) {power_set(ui.value);}
+    });
+
+    var power = $.cookie('fah_power');
+    if (typeof power == 'undefined') power = 'medium';
+
+    power_update(power);
+    power_set(power);
+}
+
+
+function power_update(power) {
+    power = power.toLowerCase();
+
+    var v = {'light': 1, 'medium': 2, 'full': 3};
+    $('#slider').slider('option', 'value', v[power]);
+
+    var margin = {'light': -1, 'medium': -12, 'full': -24}[power];
+    $('#slider').find(".ui-slider-handle").css({"margin-left": margin});
+}
+
+
+function power_set(power) {
+    if (typeof power != 'string')
+        power = {1: 'light', 2: 'medium', 3: 'full'}[power];
+
+    $.cookie('fah_power', power);
+    try {post_message(['power', power]);} catch (e) {}
 }
 
 
@@ -509,10 +541,8 @@ function progress_update(current) {
         .text(percent);
 
     var eta = Math.floor(eta_update(current));
-    if (eta)
-        $('#eta')
-        .text('The current operation will complete in about ' +
-              human_time(eta));
+    if (eta) $('#eta').text('The current operation will complete in about ' +
+                            human_time(eta)) + '.';
     else $('#eta').text('');
 }
 
@@ -741,6 +771,7 @@ function start_wu(data) {
     progress_start(0);
     post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
                   str2ab(data[4])]);
+    post_message(['power', $.cookie('fah_power')]);
 }
 
 
@@ -769,7 +800,7 @@ function return_ws() {
 
 
 function return_ws_results(data) {
-    if (data == 'success') request_assignment();
+    if (data == 'success') wu_complete();
     else return_cs(); // Try CS
 }
 
@@ -783,7 +814,7 @@ function return_cs(jqXHR, status, error) {
 
 
 function return_cs_results(data) {
-    if (typeof data != 'undefined' && data == 'success') request_assignment();
+    if (typeof data != 'undefined' && data == 'success') wu_complete();
     else return_cs_error();
 }
 
@@ -791,6 +822,12 @@ function return_cs_results(data) {
 function return_cs_error(jqXHR, status, error) {
     debug('WU return to CS failed:', error);
     backoff(return_ws, 'return', 'Waiting to retry sending results');
+}
+
+
+function wu_complete() {
+    //request_assignment();
+    post_message(['exit']);
 }
 
 
@@ -901,6 +938,9 @@ $(function () {
     // Restore state
     if ($.cookie('fah_paused')) pause_folding();
     load_identity();
+
+    // Power slider
+    power_init();
 
     // Start stop button
     $('.folding-stop .button').on('click', pause_folding);

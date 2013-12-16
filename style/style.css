@@ -255,6 +255,62 @@ a.desktop {
     height: 2.5em;
 }
 
+#power-slider {
+    height: 6em;
+}
+
+#power-slider span {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.25em;
+}
+
+#power-slider #slider {
+    height: 1em;f
+}
+
+.ui-slider .ui-slider-handle {
+    background: url(../images/slider.png) no-repeat !important;
+    width: 28px;
+    height: 37px;
+    border: none !important;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    outline: none;
+}
+
+.ui-slider .ui-slider-handle.ui-state-hover,
+.ui-slider .ui-slider-handle.ui-state-active {
+    background:
+    url(../images/slider-hover.png) no-repeat !important;
+}
+
+.ui-slider-horizontal {
+    background: url(../images/slider-bg.png) no-repeat !important;
+}
+
+.ui-slider .ui-widget-header {
+    background: none;
+}
+
+#power-slider ul {
+    margin-top: 10px;
+    padding: 0px;
+    list-style: none;
+}
+
+#power-slider ul li {
+    float: left;
+    width: 33.33%;
+    font-weight: bold;
+}
+
+#power-slider ul li.label-1 {text-align: left;}
+#power-slider ul li.label-2 {text-align: center;}
+#power-slider ul li.label-3 {text-align: right;}
+
 #control {
     padding: 1em;
     width: 345px;
@@ -275,6 +331,7 @@ a.desktop {
     -webkit-border-radius: 0.3em;
     border-radius: 0.3em;
     cursor: pointer;
+    clear: left;
 }
 
 .folding-start .button {
