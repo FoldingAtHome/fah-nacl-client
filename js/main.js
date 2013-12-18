@@ -39,6 +39,7 @@ var fah = {
 
     pausing: false,
     paused: false,
+    finish: false,
 
     last_stats: 0,
     last_progress_time: 0,
@@ -85,6 +86,7 @@ function human_time_slice(t, d1, n1, d2, n2) {
     return x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
+
 
 function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
@@ -683,6 +685,12 @@ function get_id(id) {
 
 // State Transitions ***********************************************************
 function init() {
+    if (fah.finish) {
+        pause_folding();
+        progress_update(0);
+        $.removeCookie('fah_paused');
+    }
+
     backoff_reset();
 
     if (!have_id()) request_id();
@@ -784,7 +792,7 @@ function step_wu(total, count) {
 
 
 function finish_wu(results, signature, data) {
-    status_set('running', 'Finishing work unit.');
+    status_set('running', 'Finalizing work unit.');
     fah.results = JSON.parse(results);
     fah.signature = signature;
     fah.data = data;
@@ -826,7 +834,6 @@ function return_cs_error(jqXHR, status, error) {
 
 
 function wu_complete() {
-    //request_assignment();
     post_message(['exit']);
 }
 
@@ -840,7 +847,12 @@ function folding_unpaused() {
 function folding_paused() {
     if (fah.paused) return;
 
-    status_set('paused', 'Press the start button to continue.');
+    if (fah.finish)
+        status_set('finished', 'Folding finished, exit the browser or close ' +
+                   'this page to shutdown Folding@home or press the start ' +
+                   'button to resume folding.');
+    else status_set('paused', 'Press the start button to continue.');
+
     eta_reset(false);
 
     fah.paused = true;
@@ -862,6 +874,7 @@ function pause_folding() {
 function unpause_folding() {
     if (!fah.pausing) return;
     fah.pausing = false;
+    fah.finish = false;
     $.removeCookie('fah_paused');
 
     $('.folding-start').hide();
@@ -962,11 +975,26 @@ $(function () {
     });
 
     // Share Links
-    var share_url = 'http%3A%2F%2Ffolding.stanford.edu';
+    var share_url = 'http%3A%2F%2Ffolding.stanford.edu%2Fnacl%2F';
     var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';
 
     $('a.twitter').attr({href: 'https://twitter.com/share?url=' + share_url +
                          '&text=' + share_text});
     $('a.facebook').attr({href: 'http://www.facebook.com/sharer.php?u=' +
                           share_url + '&t=' + share_text});
+
+    // Catch exit
+    window.onbeforeunload = function (e) {
+        if (fah.paused) return;
+
+        var message = 'If you choose to stay on this page Folding@home will ' +
+            'finish its current work and then pause.  You can then leave ' +
+            'with out loosing any work.';
+
+        fah.finish = true;
+
+        e = e || window.event;
+        if (e) e.returnValue = message; // For IE and Firefox
+        return message; // For Safari
+    };
 });

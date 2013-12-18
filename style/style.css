@@ -229,6 +229,10 @@ a.desktop {
     background: url('../images/paused.png') no-repeat 4px 4px #fff276;
 }
 
+#status-image.finished {
+    background: url('../images/paused.png') no-repeat 4px 4px #fff276;
+}
+
 #progress {
     border: 1px solid black;
     border-radius: 10px;
