@@ -223,7 +223,7 @@ function module_loaded() {
 
 function module_exit() {
     debug('Module exit');
-    $('#listener').html($('#listener').clone());
+    $('#fahcore').replaceWith($('#fahcore'));
 }
 
 
