@@ -1,8 +1,8 @@
 /*
               This file is part of the Folding@home NaCl Client
 
-          Copyright (c) 2013, Hong Kong University Science & Technology
-                 Copyright (c) 2013, Stanford University
+        Copyright (c) 2013-2014, Hong Kong University Science & Technology
+               Copyright (c) 2013-2014, Stanford University
                              All rights reserved.
 
         This software is free software: you can redistribute it and/or
@@ -23,21 +23,6 @@
                                Joseph Coffland
                         joseph@cauldrondevelopment.com
 */
-
-@font-face {
-  font-family: 'Oswald';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Oswald Regular'), local('Oswald-Regular'),
-  url('oswald_regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Oswald';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Oswald Bold'), local('Oswald-Bold'), url('oswald_bold.ttf')
-  format('truetype');
-}
 
 html * {
     padding: 0;
@@ -63,10 +48,30 @@ p {
 }
 
 body {
-    background: url('../images/background.png') #5875a0;
-    font-family: Oswald;
+    background: #5875a0;
+    font-family: 'PT Sans', sans-serif;
     font-size: 12pt;
 }
+
+.message {
+    background: #ece66c;
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+.message-close {
+    float: right;
+    width: 16px;
+    height: 1.5em;
+    background-image: url('../images/close.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.message-close:hover {
+    background-image: url('../images/close_hover.png');
+}
+
 
 #header {
     width: 440px;
@@ -87,7 +92,6 @@ body {
     color: #444;
     border: 3px solid #444;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, .6);
-    font-family: sans-serif;
 }
 
 #panel-header {

@@ -1,8 +1,8 @@
 /*
               This file is part of the Folding@home NaCl Client
 
-          Copyright (c) 2013, Hong Kong University Science & Technology
-                 Copyright (c) 2013, Stanford University
+        Copyright (c) 2013-2014, Hong Kong University Science & Technology
+               Copyright (c) 2013-2014, Stanford University
                              All rights reserved.
 
         This software is free software: you can redistribute it and/or
@@ -40,6 +40,7 @@ var fah = {
     pausing: false,
     paused: false,
     finish: false,
+    catch_reload: true,
 
     last_stats: 0,
     last_progress_time: 0,
@@ -49,6 +50,11 @@ var fah = {
 
     projects: {},
     dialog_widths: {},
+
+    wu_results_max_errors: 3,
+    wu_results_errors: 0,
+
+    message_id: 0,
 
     last: null
 };
@@ -127,6 +133,40 @@ function str2ab(str) {
 }
 
 
+// Messages ********************************************************************
+function message_display(msg, timeout) {
+    debug(msg);
+
+    var id = fah.message_id++;
+
+    $('<div>')
+        .addClass('message message-' + id)
+        .html(msg)
+        .prepend($('<div>')
+                 .addClass('message-close')
+                 .on('click', function () {
+                     $('.message-' + id).remove();
+                 }))
+        .prependTo('body');
+
+    if (typeof timeout != 'undefined' && timeout)
+        setTimeout(function () {
+            $('.message-' + id).remove();
+        }, timeout * 1000);
+}
+
+
+function message_warn(msg, timeout) {
+    if (typeof timeout == 'undefined') timeout = 30;
+    message_display('Warning: ' + msg, timeout);
+}
+
+
+function message_clear() {
+    $('.message').remove();
+}
+
+
 // Dialogs *********************************************************************
 function dialog_open(name, closable) {
     if (typeof closable == 'undefined') closable = true;
@@ -154,6 +194,12 @@ function dialog_open(name, closable) {
 function dialog_open_event(e) {
     dialog_open($(this).attr('name'));
     e.preventDefault();
+}
+
+
+function dialog_open_fatal(name) {
+    fah.catch_reload = false;
+    dialog_open(name, false);
 }
 
 
@@ -208,7 +254,7 @@ function module_progress(event) {
 
 
 function module_load_failed() {
-    dialog_open('load-failed', false);
+    dialog_open_fatal('load-failed');
 }
 
 
@@ -228,7 +274,7 @@ function module_exit() {
 
 
 function module_timeout() {
-    dialog_open('nacl-error', false);
+    dialog_open_fatal('nacl-error');
 }
 
 
@@ -260,7 +306,7 @@ function handle_message(event) {
 
 
 function module_error(event) {
-    debug('NaCl module error');
+    message_warn('NaCl module failure, fatal', 0);
 }
 
 
@@ -706,7 +752,7 @@ function request_id() {
 
 function process_id(data) {
     if (typeof data == 'undefined' || data[0] != 'id') {
-        debug('Unexpected response to ID request: ', data);
+        message_warn('Unexpected response to ID request: ' + data);
         request_id_error();
         return;
     }
@@ -721,7 +767,7 @@ function process_id(data) {
 
 function request_id_error(jqXHR, status, error) {
     if (typeof status != 'undefined')
-        debug(status + ': ID request failed.', error);
+        message_warn('ID request failed, retrying');
     backoff(request_id, 'id', 'Waiting to retry ID request');
 }
 
@@ -734,16 +780,20 @@ function request_assignment() {
 
 
 function assign_error(jqXHR, status, error) {
-    if (typeof status != 'undefined')
-        debug(status + ': Assignment failed.', error);
     backoff(request_assignment, 'ws',
             'Waiting to retry work server assignment');
 }
 
 
+function ws_assign_error(jqXHR, status, error) {
+    message_warn('Work Unit assignment failed, retrying');
+    assign_error(jqXHR, status, error);
+}
+
+
 function request_wu(data) {
     if (typeof data == 'undefined' || data[0] != 'assign' || data.length < 4) {
-        debug('Unexpected response to AS assignment request: ', data);
+        message_warn('Unexpected response to AS assignment request: ' + data);
         assign_error();
         return;
     }
@@ -759,13 +809,13 @@ function request_wu(data) {
     status_set('downloading', 'Requesting a work unit.');
 
     ws_call(fah.ws, 'assign', {assignment: assign, signature: data[2]},
-            start_wu, assign_error);
+            start_wu, ws_assign_error);
 }
 
 
 function start_wu(data) {
     if (typeof data == 'undefined' || data[0] != 'wu' || data.length != 5) {
-        debug('Unexpected response to WU assignment request: ', data);
+        message_warn('Unexpected response to WU assignment request: ' + data);
         assign_error();
         return;
     }
@@ -774,7 +824,9 @@ function start_wu(data) {
     debug('WU:', wu);
     fah.wu = wu;
     fah.wu_signature = data[2];
+    fah.finish = false;
 
+    message_clear();
     status_set('running', 'Starting work unit.');
     progress_start(0);
     post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
@@ -796,6 +848,7 @@ function finish_wu(results, signature, data) {
     fah.results = JSON.parse(results);
     fah.signature = signature;
     fah.data = data;
+    fah.wu_results_errors = 0;
     return_ws();
     backoff_reset('ws');
     stats_load();
@@ -807,9 +860,47 @@ function return_ws() {
 }
 
 
+function handle_ws_results(data, success, failure) {
+    if (typeof data == 'undefined') return failure();
+    if (data == 'success') return success();
+
+    if (data.length == 2 && data[0] == 'error') {
+        message_warn('Work Server said ' + data[1]);
+
+        switch (data[1]) {
+        case 'WORK_ACK':
+        case 'WORK_QUIT':
+        case 'GOT_ALREADY':
+        case 'PAST_DEADLINE':
+            // Move on
+            return success();
+
+        case 'PLEASE_WAIT':
+            // Recoverable
+            return failure();
+
+        case 'EMPTY_DATA':
+        case 'SHORT_PAYLOAD':
+            // Retry a few times
+            if (++fah.wu_results_errors < fah.wu_results_max_errors)
+                return failure();
+            // Fall through
+
+        case 'BAD_SIGNATURE':
+        case 'TOKEN_INVALID':
+        case 'BAD_VERSION':
+        case 'BAD_CORE':
+        default:
+            // Fatal
+            $('#ws-response').text(data[1]);
+            dialog_open_fatal('wu-results-error');
+            break;
+        }
+    }
+}
+
 function return_ws_results(data) {
-    if (data == 'success') wu_complete();
-    else return_cs(); // Try CS
+    handle_ws_results(data, wu_complete, return_cs);
 }
 
 
@@ -817,23 +908,29 @@ function return_cs(jqXHR, status, error) {
     debug('WU return to WS failed:', error);
 
     if (fah.wu.cs) wu_return(fah.wu.cs, return_cs_results, return_cs_error);
-    else backoff(return_ws, 'return', 'Waiting to retry sending results');
+    else wu_retry();
 }
 
 
 function return_cs_results(data) {
-    if (typeof data != 'undefined' && data == 'success') wu_complete();
-    else return_cs_error();
+    handle_ws_results(data, wu_complete, return_cs_error);
 }
 
 
 function return_cs_error(jqXHR, status, error) {
     debug('WU return to CS failed:', error);
+    wu_retry();
+}
+
+
+function wu_retry() {
+    message_warn('Failed to return results, retrying');
     backoff(return_ws, 'return', 'Waiting to retry sending results');
 }
 
 
 function wu_complete() {
+    delete fah.wu;
     post_message(['exit']);
 }
 
@@ -985,13 +1082,15 @@ $(function () {
 
     // Catch exit
     window.onbeforeunload = function (e) {
-        if (fah.paused) return;
+        if (fah.paused || !fah.catch_reload || typeof fah.wu == 'undefined')
+            return;
 
         var message = 'If you choose to stay on this page Folding@home will ' +
             'finish its current work and then pause.  You can then leave ' +
             'with out loosing any work.';
 
         fah.finish = true;
+        message_display('Finishing current work unit', 30);
 
         e = e || window.event;
         if (e) e.returnValue = message; // For IE and Firefox
