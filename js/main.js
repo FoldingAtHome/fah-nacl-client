@@ -40,7 +40,6 @@ var fah = {
     pausing: false,
     paused: false,
     finish: false,
-    catch_reload: true,
 
     last_stats: 0,
     last_progress_time: 0,
@@ -137,6 +136,8 @@ function str2ab(str) {
 function message_display(msg, timeout) {
     debug(msg);
 
+    $('.message:contains("' + msg + '")').remove();
+
     var id = fah.message_id++;
 
     $('<div>')
@@ -159,11 +160,6 @@ function message_display(msg, timeout) {
 function message_warn(msg, timeout) {
     if (typeof timeout == 'undefined') timeout = 30;
     message_display('Warning: ' + msg, timeout);
-}
-
-
-function message_clear() {
-    $('.message').remove();
 }
 
 
@@ -198,8 +194,8 @@ function dialog_open_event(e) {
 
 
 function dialog_open_fatal(name) {
-    fah.catch_reload = false;
     dialog_open(name, false);
+    delete fah.wu;
 }
 
 
@@ -775,7 +771,13 @@ function request_id_error(jqXHR, status, error) {
 function request_assignment() {
     status_set('downloading', 'Requesting a work server assignment.');
     delete fah.results;
-    as_call('assign', {client_id: get_id()}, request_wu, assign_error);
+    as_call('assign', {client_id: get_id()}, request_wu, as_assign_error);
+}
+
+
+function as_assign_error(jqXHR, status, error) {
+    message_warn('Work Server assignment failed');
+    assign_error(jqXHR, status, error);
 }
 
 
@@ -826,7 +828,6 @@ function start_wu(data) {
     fah.wu_signature = data[2];
     fah.finish = false;
 
-    message_clear();
     status_set('running', 'Starting work unit.');
     progress_start(0);
     post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
@@ -865,9 +866,10 @@ function handle_ws_results(data, success, failure) {
     if (data == 'success') return success();
 
     if (data.length == 2 && data[0] == 'error') {
-        message_warn('Work Server said ' + data[1]);
+        var status = data[1].split(' ')[0];
+        message_warn('Work Server said ' + status);
 
-        switch (data[1]) {
+        switch (status) {
         case 'WORK_ACK':
         case 'WORK_QUIT':
         case 'GOT_ALREADY':
@@ -892,7 +894,7 @@ function handle_ws_results(data, success, failure) {
         case 'BAD_CORE':
         default:
             // Fatal
-            $('#ws-response').text(data[1]);
+            $('#ws-response').text(status);
             dialog_open_fatal('wu-results-error');
             break;
         }
@@ -1082,7 +1084,7 @@ $(function () {
 
     // Catch exit
     window.onbeforeunload = function (e) {
-        if (fah.paused || !fah.catch_reload || typeof fah.wu == 'undefined')
+        if (fah.paused || typeof fah.wu == 'undefined')
             return;
 
         var message = 'If you choose to stay on this page Folding@home will ' +
