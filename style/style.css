@@ -72,6 +72,10 @@ body {
     background-image: url('../images/close_hover.png');
 }
 
+div.what {
+    float: right;
+    font-size: 80%;
+}
 
 #header {
     width: 440px;
@@ -97,7 +101,7 @@ body {
 #panel-header {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    font-size: 14pt;
+    font-size: 12pt;
     font-weight: bold;
     background: #fff;
     color: #818d9f;
@@ -115,6 +119,7 @@ body {
 
 #menu li {
     display: inline;
+    padding: 0 0.1em;
 }
 
 #menu {
@@ -126,9 +131,10 @@ body {
 }
 
 #menu img {
-    width: 32px;
+    width: 24px;
     border: 1px solid #fff;
     vertical-align: middle;
+    margin-bottom: 5px;
 }
 
 #menu img:hover {
@@ -144,14 +150,25 @@ a.button {
     border-radius: 5px;
     margin-top: -0.2em;
     padding: 0.2em;
+    line-height: 1.5em;
 }
 
 a.button:hover {
     background: #ddd;
 }
 
+#menu .google-button {
+    position: relative;
+    top: 5px;
+}
+
 a.desktop {
     color: #42c0fb;
+}
+
+#menu .desktop img {
+    width: 16px;
+    vertical-align: inherit;
 }
 
 #identity {
@@ -267,14 +284,17 @@ a.desktop {
     height: 6em;
 }
 
+#control #power-slider .what {
+    margin-top: -0.25em;
+}
+
 #power-slider span {
-    display: block;
     font-weight: bold;
     margin-bottom: 0.25em;
 }
 
 #power-slider #slider {
-    height: 1em;f
+    height: 1em;
 }
 
 .ui-slider .ui-slider-handle {
@@ -325,6 +345,11 @@ a.desktop {
     float: left;
 }
 
+#control .what {
+    margin-top: -1.25em;
+    margin-bottom: 0.25em;
+}
+
 .folding-start {display: none;}
 
 .folding-start .button, .folding-stop .button {
@@ -362,6 +387,10 @@ a.desktop {
     padding: 1em;
     width: 450px;
     float: right;
+}
+
+#project .what {
+    margin-top: -1em;
 }
 
 #project .brief {
@@ -488,12 +517,11 @@ a.desktop {
     display: none;
 }
 
-#learn-dialog {
-    width: 80%;
+#learn-dialog, #help-dialog, #project-dialog {
+    width: 60em;
 }
 
 #project-dialog {
-    width: 60em;
     font-size: 12pt;
 }
 

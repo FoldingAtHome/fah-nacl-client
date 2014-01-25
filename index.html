@@ -66,8 +66,10 @@
           </li>
           <li><a href="#" class="facebook"><img src="images/facebook.png"/></a>
           </li>
-          <li><g:plusone href="http://folding.stanford.edu/nacl/" size="medium">
-          </g:plusone></li>
+          <li class="google-button">
+            <div class="g-plusone" data-size="standard"
+                 data-href="http://folding.stanford.edu/nacl/"></div>
+          </li>
           <li>|</li>
           <li><a class="dialog-link button" name="learn" href="#">Learn</a></li>
           <li><a class="button" href="http://folding.stanford.edu/home/blog"
@@ -95,6 +97,11 @@
       </div>
 
       <div id="control">
+        <div class="what">
+          <a class="dialog-link" name="progress-bar"
+             href="#">What's this?</a>
+        </div>
+
         <div id="status">
           <div id="status-image" class="stopped"></div>
           <div id="progress"><div></div></div>
@@ -104,6 +111,10 @@
         <p id="eta"></p>
 
         <div id="power-slider">
+          <div class="what">
+            <a class="dialog-link" name="folding-power"
+               href="#">What's this?</a>
+          </div>
           <span>Folding Power</span>
           <div id="slider"></div>
           <ul>
@@ -116,7 +127,7 @@
         <div class="folding-start">
           <div class="button">Start Folding</div>
           <p>
-            Folding is currently paused.  When you are ready click the button
+            Folding is currently paused.  When you are ready, click the button
             above to start folding.
           </p>
         </div>
@@ -132,6 +143,11 @@
       </div>
 
       <div id="project">
+        <div class="what">
+          <a class="dialog-link" name="project-box"
+             href="#">What's this?</a>
+        </div>
+
         <h4>You are contributing to project <span class="project">N/A</span>.
         </h4>
         <div class="brief"></div>
@@ -148,6 +164,35 @@
   <div id="dialogs">
     <div id="points-dialog"></div>
     <div id="project-dialog"></div>
+
+    <div title="What's the Progress Bar?" id="progress-bar-dialog">
+      <p>
+        The progress bar shows an estimate of how long the current task should
+        take.  The text directly below the progress bar tells you what task
+        the client is currently working on.  Typical tasks are downloading,
+        waiting, running a simulation or sending back results.
+      </p>
+    </div>
+
+    <div title="What's the Project Box?" id="project-box-dialog">
+      <p>
+        Scientists submit simulation projects to Folding@home.
+        The project box displays information about the simulation project
+        currently running on your computer.  It tells you information about
+        the science, the type of disease being targeted and the person
+        or persons responsible for the research.
+      </p>
+    </div>
+
+    <div title="What's Folding Power?" id="folding-power-dialog">
+      <p>
+        Folding power controls how much of your computer's resources
+        Folding@home uses.  If you want to see what your high performance
+        system can do crank it up to <em>Full</em>.  If your computer
+        starts to stress out move it to <em>Light</em> to give it a
+        break.
+      </p>
+    </div>
 
     <div title="Identity not saved" id="invalid-id-dialog">
       <img class="icon" src="images/error.png"/>
@@ -423,7 +468,7 @@
 
       Or try our
       <a class="desktop" href="http://folding.stanford.edu">Desktop App
-        <img width="16" src="images/link.png"/></a>.
+        <img src="images/link.png"/></a>.
     </div>
   </div>
   <div id="overlay"></div>
