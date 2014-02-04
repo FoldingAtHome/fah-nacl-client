@@ -7,4 +7,4 @@ This project contains the source code for the Open-Source frontend of the Foldin
 
 Email joseph@cauldrondevelopment.com for more info.
 
-[0]: https://github.com/FoldingAtHome/fah-nacl-client/blob/master/images/fah-logo-small.png "Folding@home logo"
+[0]: https://raw.github.com/FoldingAtHome/fah-nacl-client/blob/master/images/fah-logo-small.png "Folding@home logo"
