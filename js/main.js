@@ -29,7 +29,7 @@ var fah = {
     user: 'Anonymous',
     team: 0,
 
-    as_url: 'http://fah.stanford.edu:8080',
+    as_url: 'http://assign5.stanford.edu',
     stats_url: 'http://folding.stanford.edu/stats.py',
     project_url: 'http://folding.stanford.edu/project-jsonp.py',
 
