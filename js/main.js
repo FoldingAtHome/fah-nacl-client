@@ -680,6 +680,7 @@ function server_call(url, data, success, error) {
     if (typeof data == 'undefined') data = {};
     data.version = fah.version;
     data.type = 'NACL';
+    data.os = 'NACL';
     data.user = fah.user;
     data.team = fah.team;
     data.passkey = fah.passkey;
