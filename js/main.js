@@ -30,8 +30,8 @@ var fah = {
     team: 0,
 
     as_url: 'http://assign5.stanford.edu',
-    stats_url: 'http://folding.stanford.edu/stats.py',
-    project_url: 'http://folding.stanford.edu/project-jsonp.py',
+    stats_url: '//folding.stanford.edu/stats.py',
+    project_url: '//folding.stanford.edu/project-jsonp.py',
 
     max_project_brief: 600, // Maximum brief project description length
     min_delay: 15,
