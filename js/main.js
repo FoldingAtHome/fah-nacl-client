@@ -271,6 +271,7 @@ function module_exit() {
 
 function module_timeout() {
     dialog_open_fatal('nacl-error');
+    fah.pausing = fah.paused = true;
 }
 
 
