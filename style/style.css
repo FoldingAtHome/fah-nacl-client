@@ -528,6 +528,13 @@ a.desktop {
     font-size: 12pt;
 }
 
+#folding-power-dialog th {
+    font-weight: normal;
+    padding-right: 1em;
+    padding-left: 2em;
+    text-align: right;
+}
+
 #fahcore {
     width: 0;
     height: 0;
