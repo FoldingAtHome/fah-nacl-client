@@ -306,7 +306,37 @@ function module_error(event) {
 }
 
 
-/**************************** Stats functions *********************************/
+// Config **********************************************************************
+function config_set(key, value, expires) {
+    if (typeof(expires) == 'undefined') expires = 100 * 365;
+
+    $.cookie('fah_' + key, value, {expires: expires});
+
+    if (key == 'passkey') value = '********************************';
+    debug('Config: ' + key + ' = ' + value);
+}
+
+
+function config_get(key, defaultValue) {
+    if (typeof(defaultValue) != 'undefined' && !config_has(key))
+        return defaultValue;
+
+    return $.cookie('fah_' + key);
+}
+
+
+function config_has(key) {
+    return typeof($.cookie('fah_' + key)) != 'undefined';
+}
+
+
+function config_del(key) {
+    $.removeCookie('fah_' + key);
+    debug('Config: deleted ' + key);
+}
+
+
+// Stats functions *************************************************************
 function stats_load() {
     if (fah.user.toLowerCase() == 'anonymous' && fah.team == 0) {
         $('#points').text('Choose a name and earn points. ' +
@@ -535,9 +565,7 @@ function power_init() {
         stop: function(e, ui) {power_set(ui.value);}
     });
 
-    var power = $.cookie('fah_power');
-    if (typeof power == 'undefined') power = 'medium';
-
+    var power = config_get('power', 'medium');
     power_update(power);
     power_set(power);
 }
@@ -558,7 +586,7 @@ function power_set(power) {
     if (typeof power != 'string')
         power = {1: 'light', 2: 'medium', 3: 'full'}[power];
 
-    $.cookie('fah_power', power);
+    config_set('power', power);
     try {post_message(['power', power]);} catch (e) {}
 }
 
@@ -710,33 +738,17 @@ function wu_return(server, success, error) {
 }
 
 
-// Status Functions ************************************************************
-function have_id() {
-    return typeof $.cookie('fah_id') != 'undefined';
-}
-
-
-function set_id(id) {
-    $.cookie('fah_id', id, {expires: 3650});
-}
-
-
-function get_id(id) {
-    return $.cookie('fah_id');
-}
-
-
 // State Transitions ***********************************************************
 function init() {
     if (fah.finish) {
         pause_folding();
         progress_update(0);
-        $.removeCookie('fah_paused');
+        config_del('paused');
     }
 
     backoff_reset();
 
-    if (!have_id()) request_id();
+    if (!config_has('id')) request_id();
     else request_assignment();
 }
 
@@ -754,9 +766,7 @@ function process_id(data) {
         return;
     }
 
-    var id = data[1];
-    debug('ID:', id);
-    $.cookie('fah_id', id, {expires: 3650});
+    config_set('id', data[1]);
 
     request_assignment();
 }
@@ -772,7 +782,7 @@ function request_id_error(jqXHR, status, error) {
 function request_assignment() {
     status_set('downloading', 'Requesting a work server assignment.');
     delete fah.results;
-    as_call('assign', {client_id: get_id(), threads: fah.threads},
+    as_call('assign', {client_id: config_get('id'), threads: fah.threads},
             request_wu, as_assign_error);
 }
 
@@ -834,7 +844,7 @@ function start_wu(data) {
     progress_start(0);
     post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
                   str2ab(data[4])]);
-    post_message(['power', $.cookie('fah_power')]);
+    post_message(['power', config_get('power')]);
 }
 
 
@@ -963,7 +973,7 @@ function folding_paused() {
 function pause_folding() {
     if (fah.pausing) return;
     fah.pausing = true;
-    $.cookie('fah_paused', true);
+    config_set('paused', true);
 
     $('.folding-stop').hide();
     $('.folding-start').show();
@@ -976,7 +986,7 @@ function unpause_folding() {
     if (!fah.pausing) return;
     fah.pausing = false;
     fah.finish = false;
-    $.removeCookie('fah_paused');
+    config_del('paused');
 
     $('.folding-start').hide();
     $('.folding-stop').show();
@@ -987,14 +997,20 @@ function unpause_folding() {
 
 // Identity ********************************************************************
 function load_identity() {
-    if ($.cookie('fah_user'))
-        $('input.user').val(fah.user = $.cookie('fah_user'));
+    if (config_has('user')) {
+        $('input.user').val(fah.user = config_get('user'));
+        config_set('user', config_get('user')); // Extend expiration
+    }
 
-    if ($.cookie('fah_team'))
-        $('input.team').val(fah.team = $.cookie('fah_team'));
+    if (config_has('team')) {
+        $('input.team').val(fah.team = config_get('team'));
+        config_set('team', config_get('team')); // Extend expiration
+    }
 
-    if ($.cookie('fah_passkey'))
-        $('input.passkey').val(fah.passkey = $.cookie('fah_passkey'));
+    if (config_has('passkey')) {
+        $('input.passkey').val(fah.passkey = config_get('passkey'));
+        config_set('passkey', config_get('passkey')); // Extend expiration
+    }
 
     stats_load();
 }
@@ -1025,12 +1041,12 @@ function save_identity(e) {
 
         dialog_open('invalid-id');
 
-    } else {
-        $.cookie('fah_user', fah.user = user);
-        $.cookie('fah_team', fah.team = team);
-        $.cookie('fah_passkey', fah.passkey = passkey);
+    } else if (fah.user != user || fah.team != team || fah.passkey != passkey) {
+        config_set('user', fah.user = user);
+        config_set('team', fah.team = team);
+        config_set('passkey', fah.passkey = passkey);
 
-        debug('Identity saved');
+        message_display('Identity changes saved');
         stats_load();
     }
 }
@@ -1049,8 +1065,12 @@ $(function () {
     // Open all links in new tab
     $('a').attr('target', '_blank');
 
+    // Passkey field on hover show-hide
+    $('input.passkey').hover(function() {$(this).attr('type', 'text');},
+                             function() {$(this).attr('type', 'password');});
+
     // Restore state
-    if ($.cookie('fah_paused')) pause_folding();
+    if (config_get('paused')) pause_folding();
     load_identity();
 
     // Power slider
