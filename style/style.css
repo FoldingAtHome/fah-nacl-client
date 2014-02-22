@@ -193,7 +193,7 @@ a.desktop {color: #42c0fb;}
 }
 
 #status-image.uploading {
-    background: url('../images/upload.gif') no-repeat 3px 3px #64ca7d;
+    background: url('../images/upload.gif') no-repeat 3px 0px #64ca7d;
 }
 
 #status-image.downloading {

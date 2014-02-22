@@ -702,7 +702,7 @@ function countdown(delay, call) {
 
 
 // Network functions ***********************************************************
-function server_call(url, data, success, error) {
+function server_call(url, data, success, error, upload, download) {
     if (fah.pausing) {
         folding_paused();
         setTimeout(function () {server_call(url, data, success, error);}, 250);
@@ -720,7 +720,26 @@ function server_call(url, data, success, error) {
 
     url += '?' + Math.random();
     $.ajax({url: url, type: 'POST', data: JSON.stringify(data),
-            dataType: 'json', contentType: 'application/json; charset=utf-8'})
+            dataType: 'json', contentType: 'application/json; charset=utf-8',
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+
+                // Upload progress
+                if (typeof(upload) != 'undefined')
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable)
+                            upload(evt.loaded / evt.total);
+                    }, false);
+
+                // Download progress
+                if (typeof(download) != 'undefined')
+                    xhr.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable)
+                            download(evt.loaded / evt.total);
+                    }, false);
+
+                return xhr;
+            }})
         .done(success).fail(error);
 }
 
@@ -730,16 +749,17 @@ function as_call(cmd, data, success, error) {
 }
 
 
-function ws_call(ws, cmd, data, success, error) {
-    server_call('http://' + ws + ':8080/api/' + cmd, data, success, error);
+function ws_call(ws, cmd, data, success, error, upload, download) {
+    server_call('http://' + ws + ':8080/api/' + cmd, data, success, error,
+                upload, download);
 }
 
 
 function wu_return(server, success, error) {
-    // TODO monitor upload progress
+    progress_start(1);
     ws_call(server, 'results',
             {wu: fah.wu, results: fah.results, signature: fah.signature,
-             data: fah.data}, success, error);
+             data: fah.data}, success, error, progress_update);
 }
 
 
@@ -825,10 +845,11 @@ function request_wu(data) {
     project_load(fah.project = assign.project);
     fah.as_cert = data[3];
 
-    status_set('downloading', 'Requesting a work unit.');
+    status_set('downloading', 'Downloading a work unit.');
 
+    progress_start(1);
     ws_call(fah.ws, 'assign', {assignment: assign, signature: data[2]},
-            start_wu, ws_assign_error);
+            start_wu, ws_assign_error, undefined, progress_update);
 }
 
 
@@ -862,7 +883,7 @@ function step_wu(total, count) {
 
 
 function finish_wu(results, signature, data) {
-    status_set('running', 'Finalizing work unit.');
+    status_set('uploading', 'Uploading results.');
     fah.results = JSON.parse(results);
     fah.signature = signature;
     fah.data = data;
