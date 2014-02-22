@@ -59,28 +59,42 @@
 
     <div id="panel">
       <div id="panel-header">
-        <span>CONTROL PANEL</span>
-        <ul id="menu">
-          <li>Share:</li>
-          <li><a href="#" class="twitter"><img src="images/twitter.png"/></a>
-          </li>
-          <li><a href="#" class="facebook"><img src="images/facebook.png"/></a>
-          </li>
-          <li class="google-button">
-            <div class="g-plusone" data-size="standard"
-                 data-href="http://folding.stanford.edu/nacl/"></div>
-          </li>
-          <li>|</li>
-          <li><a class="dialog-link button" name="learn" href="#">Learn</a></li>
-          <li><a class="button" href="http://folding.stanford.edu/home/blog"
-                 >News</a></li>
-          <li><a class="dialog-link button" name="help" href="#">Help</a></li>
-          <li>|</li>
-          <li><a class="desktop button" title="Try our desktop application"
-                 href="http://folding.stanford.edu/">Desktop App
-              <img src="images/link.png"/>
-          </a></li>
-        </ul>
+        <table id="menu"><tr>
+            <td class="left">
+              <span>Share:</span>
+              <span>
+                <a href="#" class="twitter"><img src="images/twitter.png"/></a>
+              </span>
+              <span>
+                <a href="#" class="facebook">
+                  <img src="images/facebook.png"/>
+                </a>
+              </span>
+              <span class="google-button">
+                <div class="g-plusone" data-size="standard"
+                     data-href="http://folding.stanford.edu/nacl/"></div>
+              </span>
+            </td>
+            <td class="middle">
+              <span>
+                <a class="dialog-link button" name="learn" href="#">Learn</a>
+              </span>
+              <span>
+                <a class="button" href="http://folding.stanford.edu/home/blog"
+                   >News</a>
+              </span>
+              <span>
+                <a class="dialog-link button" name="help" href="#">Help</a>
+              </span>
+            </td><td class="right">
+              <span>
+                <a class="desktop button" title="Try our desktop application."
+                   href="http://folding.stanford.edu/">Desktop App
+                  <img src="images/link.png"/>
+                </a>
+              </span>
+            </td>
+        </tr></table>
       </div>
 
       <div id="identity">
@@ -166,6 +180,7 @@
     <div id="project-dialog"></div>
 
     <div title="What's the Progress Bar?" id="progress-bar-dialog">
+      <center><img src="images/progressbar.png"/></center>
       <p>
         The progress bar shows an estimate of how long the current task should
         take.  The text directly below the progress bar tells you what task
@@ -263,9 +278,14 @@
         to report bugs.
       </p>
 
-      <hr/>
+      <h4>More Info</h4>
+      <p>For more about the science of protein folding and the Folding@home
+        project,
+        <a href="http://folding.stanford.edu/home/the-science/">click here</a>.
+      </p>
+
       <h4>Credits</h4>
-      <img class="icon" src="images/hkust.png"/>
+      <a href="http://www.ust.hk"><img class="icon" src="images/hkust.png"/></a>
       <ul>
         <li>Dr. Xuhui Huang - Project Leader</li>
         <li>Joseph Coffland - Software Developer</li>
@@ -274,12 +294,6 @@
       <p>This project was made possible in part by funding from the
         <a href="http://www.ust.hk">Hong Kong University of Science &amp;
           Technology</a>.
-      </p>
-
-      <hr/>
-      <p>For more about the science of protein folding and the Folding@home
-        project,
-        <a href="http://folding.stanford.edu/home/the-science/">click here</a>.
       </p>
     </div>
 

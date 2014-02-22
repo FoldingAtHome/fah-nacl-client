@@ -34,13 +34,9 @@ a {
     color: #8e0028;
 }
 
-a:hover {
-    text-decoration: none;
-}
+a:hover {text-decoration: none;}
 
-p {
-    padding: 1em 0;
-}
+p {padding: 1em 0;}
 
 .clearfix {
     content: " ";
@@ -111,61 +107,41 @@ div.what {
     line-height: 32px;
 }
 
-#menu {
-    float: right;
-    list-style: none;
-    display: block;
-    text-align: right;
-}
-
-#menu li {
-    display: inline;
-    padding: 0 0.1em;
-}
-
-#menu {
-    list-style: none;
-}
-
-#menu a {
-    text-decoration: none;
-}
+#menu {width: 100%;}
+#menu td {width: 33%;}
+#menu td.left {text-align: left;}
+#menu td.middle {text-align: center;}
+#menu td.right {text-align: right;}
+#menu span {padding: 0 0.2em;}
+#menu a {text-decoration: none;}
 
 #menu img {
     width: 24px;
     border: 1px solid #fff;
     vertical-align: middle;
     margin-bottom: 5px;
+    border-radius: 5px;
 }
 
-#menu img:hover {
-    border: 1px solid #888;
-}
-
-#menu .button img, #menu .button img:hover {
-    border: 0;
-}
+#menu img:hover {border: 1px solid #ddd;}
+#menu .button img, #menu .button img:hover {border: 0;}
 
 a.button {
     display: inline-block;
+    /*border: 1px solid #ddd;*/
     border-radius: 5px;
-    margin-top: -0.2em;
-    padding: 0.2em;
+    padding: 0.1em 0.2em;
     line-height: 1.5em;
 }
 
-a.button:hover {
-    background: #ddd;
-}
+a.button:hover {background: #ddd;}
 
 #menu .google-button {
     position: relative;
     top: 5px;
 }
 
-a.desktop {
-    color: #42c0fb;
-}
+a.desktop {color: #42c0fb;}
 
 #menu .desktop img {
     width: 16px;
@@ -177,17 +153,9 @@ a.desktop {
     width: 850px;
 }
 
-#identity p {
-    padding: 0.25em 0;
-}
-
-#identity input.user {
-    width: 14em;
-}
-
-#identity input.team {
-    width: 5em;
-}
+#identity p {padding: 0.25em 0;}
+#identity input.user {width: 14em;}
+#identity input.team {width: 5em;}
 
 #identity input.passkey {
     width: 20em;
@@ -274,30 +242,17 @@ a.desktop {
     padding: 2px 2px 2px 10px;
 }
 
-#status-text {
-    font-weight: bold;
-}
-
-#eta {
-    height: 2.5em;
-}
-
-#power-slider {
-    height: 6em;
-}
-
-#control #power-slider .what {
-    margin-top: -0.25em;
-}
+#status-text {font-weight: bold;}
+#eta {height: 2.5em;}
+#power-slider {height: 6em;}
+#control #power-slider .what {margin-top: -0.25em;}
 
 #power-slider span {
     font-weight: bold;
     margin-bottom: 0.25em;
 }
 
-#power-slider #slider {
-    height: 1em;
-}
+#power-slider #slider {height: 1em;}
 
 .ui-slider .ui-slider-handle {
     background: url(../images/slider.png) no-repeat !important;
@@ -321,9 +276,7 @@ a.desktop {
     background: url(../images/slider-bg.png) no-repeat !important;
 }
 
-.ui-slider .ui-widget-header {
-    background: none;
-}
+.ui-slider .ui-widget-header {background: none;}
 
 #power-slider ul {
     margin-top: 10px;
@@ -392,17 +345,9 @@ a.desktop {
     overflow: hidden;
 }
 
-#project .what {
-    margin-top: -1em;
-}
-
-#project .brief {
-    margin-top: 1em;
-}
-
-.brief .project .pthumb {
-    max-width: 200px;
-}
+#project .what {margin-top: -1em;}
+#project .brief {margin-top: 1em;}
+.brief .project .pthumb {max-width: 200px;}
 
 .project .pthumb {
     float: right;
@@ -417,20 +362,20 @@ a.desktop {
     margin-left: 0;
 }
 
-#dialogs {
-    display: none;
+#dialogs {display: none;}
+
+.ui-dialog {
+    font-size: 12pt;
+    font-family: Arial;
 }
 
-.ui-dialog ul, .ui-dialog ol {
-    margin: 1em 2em;
-}
-
-.ui-dialog li {
-    margin: 0.5em 1em 0.5em 0.25em;
-}
-
-.ui-dialog h1, .ui-dialog h2, .ui-dialog h3 {
-    margin: 0.5em 0;
+.ui-dialog hr {margin: 0.5em 0;}
+.ui-dialog p {padding: 0.25em 0;}
+.ui-dialog ul, .ui-dialog ol {margin: 1em 2em;}
+.ui-dialog li {margin: 0.5em 1em 0.5em 0.25em;}
+.ui-dialog h1, .ui-dialog h2, .ui-dialog h3, .ui-dialog h4 {
+    margin: 1em 0 0 0;
+    text-decoration: underline;
 }
 
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
@@ -439,18 +384,9 @@ a.desktop {
     margin: auto;
 }
 
-.ui-widget-content a {
-    color: #8e0028;
-}
-
-#invalid-id-dialog {
-    width: 500px;
-    font-size: 90%;
-}
-
-#invalid-id-dialog p {
-    padding: 0.25em;
-}
+.ui-widget-content a {color: #8e0028;}
+#invalid-id-dialog {width: 500px;}
+#invalid-id-dialog p {padding: 0.25em;}
 
 #invalid-id-dialog div {
     background: #eee;
@@ -459,9 +395,7 @@ a.desktop {
     margin: 0.5em 0;
 }
 
-#bug-dialog {
-    text-align: left;
-}
+#bug-dialog {text-align: left;}
 
 #bug-dialog img, #bug-submitting-dialog img {
     float: right;
@@ -469,25 +403,11 @@ a.desktop {
     margin-bottom: -64px;
 }
 
-#bug-dialog table, #bug-dialog td, #bug-dialog textarea {
-    width: 100%;
-}
-
-#bug-dialog td {
-    padding: 5px;
-}
-
-#bug-dialog textarea {
-    font-size: 80%;
-}
-
-#bug-dialog p {
-    font-size: 80%;
-}
-
-#bug-disclaimer {
-    font-size: 90%;
-}
+#bug-dialog table, #bug-dialog td, #bug-dialog textarea {width: 100%;}
+#bug-dialog td {padding: 5px;}
+#bug-dialog textarea {font-size: 80%;}
+#bug-dialog p {font-size: 80%;}
+#bug-disclaimer {font-size: 90%;}
 
 #bug-iframe {
     width: 400px;
@@ -495,13 +415,9 @@ a.desktop {
     border: 0;
 }
 
-.input-warn {
-    border: 3px solid red;
-}
+.input-warn {border: 3px solid red;}
 
-#nacl-error-dialog {
-    width: 45em;
-}
+#nacl-error-dialog {width: 45em;}
 
 #nacl-error-dialog li {
     padding: 0.25em;
@@ -520,13 +436,7 @@ a.desktop {
     display: none;
 }
 
-#learn-dialog, #help-dialog, #project-dialog {
-    width: 60em;
-}
-
-#project-dialog {
-    font-size: 12pt;
-}
+#learn-dialog, #help-dialog, #project-dialog {width: 42em;}
 
 #folding-power-dialog th {
     font-weight: normal;
@@ -545,9 +455,7 @@ img.bug-icon {
     vertical-align: middle;
 }
 
-img.icon {
-    float: right;
-}
+img.icon {float: right;}
 
 .ui-widget-overlay {
     opacity: 0.6;

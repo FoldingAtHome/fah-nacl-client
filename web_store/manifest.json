@@ -1,0 +1,19 @@
+{
+    "name": "Folding@home",
+    "description": "Help scientists fight diseases, such as cancer, by donating your unused\ncomputing power by running Folding@home in a browser window.",
+    "version": "1.0.0",
+    "author": "Stanford University",
+    "manifest_version": 2,
+    "icons": {
+        "128": "icon_128.png",
+        "16": "icon_16.png"
+    },
+    "app": {
+        "urls": [ "http://folding.stanford.edu/nacl/" ],
+        "launch": {
+            "web_url": "http://folding.stanford.edu/nacl/"
+        }
+    },
+    "homepage_url": "http://folding.stanford.edu/",
+    "offline_enabled": false
+}

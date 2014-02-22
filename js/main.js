@@ -455,7 +455,7 @@ function project_update(data) {
         // Shorten brief description if necessary
         var desc;
         if (fah.max_project_brief - 3 < p.pdesc.length)
-            desc = p.pdesc.substr(0, fah.max_project_brief - 3) + '...';
+            desc = p.pdesc.substr(0, fah.max_project_brief - 3) + '. . .';
         else desc = p.pdesc;
 
         // Thumb
@@ -479,10 +479,13 @@ function project_update(data) {
         // Details
         details = $('<div>').addClass('project details');
         if (thumb) details.append(thumb.clone());
-        $('<p>').text('Disease Type: ' + p.disease).appendTo(details);
-        details.append(p.pdesc);
-        details.append('<br>');
-        $('<em>').text('Project managed by ' + p.name + ' at ' + p.uni + '.')
+        $('<p>')
+            .append($('<em>').text('Disease Type:'))
+            .append(' ' + p.disease)
+            .appendTo(details);
+        $('<p>').html(p.pdesc).appendTo(details);
+        details.append('<hr>');
+        $('<em>').text('Managed by ' + p.name + ' at ' + p.uni + '.')
             .appendTo(details);
         if (p.url != '') $('<p>').append('URL: ')
             .append($('<a>').attr('href', p.url).text(p.url)).appendTo(details);
@@ -490,7 +493,7 @@ function project_update(data) {
             $('<div>').addClass('mthumb')
             .append($('<img>').attr('src', 'data:;base64, ' + p.mthumb))
             .appendTo(details);
-        details.append(p.mdesc);
+        $('<p>').html(p.mdesc).appendTo(details);
     }
 
     fah.projects[p.id] = {brief: brief, details: details};
@@ -632,6 +635,7 @@ function status_set(status, msg) {
     if (status != 'paused') {
         if (fah.status == status && fah.msg == msg) return;
 
+        debug('Status: ' + status + ': ' + msg);
         fah.status = status;
         fah.msg = msg;
     }
