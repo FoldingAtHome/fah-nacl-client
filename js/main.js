@@ -617,7 +617,7 @@ function progress_update(current) {
         .text(percent);
 
     var eta = Math.floor(eta_update(current));
-    if (eta) $('#eta').text('The current operation will complete in about ' +
+    if (eta) $('#eta').text('Completion expected in about ' +
                             human_time(eta)) + '.';
     else $('#eta').text('');
 }
@@ -875,7 +875,7 @@ function start_wu(data) {
 
 
 function step_wu(total, count) {
-    status_set('running', 'Running work unit.');
+    status_set('running', 'Calculations underway.');
     fah.progress_total = total;
     var eta = (total - count) / 10; // TODO
     progress_update(count, eta);
@@ -1137,7 +1137,7 @@ $(function () {
 
         var message = 'If you choose to stay on this page Folding@home will ' +
             'finish its current work and then pause.  You can then leave ' +
-            'with out loosing any work.';
+            'with out losing any work.';
 
         fah.finish = true;
         message_display('Finishing current work unit', 30);
