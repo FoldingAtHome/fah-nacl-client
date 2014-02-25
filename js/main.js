@@ -88,7 +88,7 @@ function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
     var y = int((t % d1) / d2);
 
-    return x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
+    return 'about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
 
@@ -99,11 +99,11 @@ function human_time(t) {
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
     if (MIN <= t) {
         var x = int(t / MIN);
-        return x + ' minute' + (1 < x ? 's' : '');
+        return 'about ' + x + ' minute' + (1 < x ? 's' : '');
     }
 
     if (t > 10) //t is greater than 10 seconds
-        return "a minute"
+        return "less than a minute"
     else
         return "a few seconds"
 }
@@ -623,7 +623,7 @@ function progress_update(current) {
         .text(percent);
 
     var eta = Math.floor(eta_update(current));
-    if (eta) $('#eta').text('Completion expected in about ' +
+    if (eta) $('#eta').text('Completion expected in ' +
                             human_time(eta)) + '.';
     else $('#eta').text('');
 }
