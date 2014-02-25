@@ -82,7 +82,7 @@ function int(x) {
 var MIN = 60;
 var HOUR = 60 * MIN;
 var DAY = 24 * HOUR;
-var YEAR = 356 * DAY;
+var YEAR = 365 * DAY;
 
 function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
