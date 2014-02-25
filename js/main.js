@@ -97,9 +97,15 @@ function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
-    if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
+    if (MIN <= t) {
+        var x = int(t / MIN);
+        return x + ' minutes' + (1 < x ? 's' : '');
+    }
 
-    return t + ' second' + (1 < t ? 's' : '');
+    if (t > 10) //t is greater than 10 seconds
+        return "in about a minute"
+    else
+        return "in a few seconds"
 }
 
 
@@ -696,7 +702,7 @@ function countdown(delay, call) {
         return;
     }
 
-    var delta = Math.min(250, delay);
+    var delta = Math.min(1000, delay);
     setTimeout(function () {countdown(delay - delta, call);}, delta);
 }
 
