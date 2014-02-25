@@ -103,9 +103,9 @@ function human_time(t) {
     }
 
     if (t > 10) //t is greater than 10 seconds
-        return "in about a minute"
+        return "a minute"
     else
-        return "in a few seconds"
+        return "a few seconds"
 }
 
 
