@@ -99,7 +99,7 @@ function human_time(t) {
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
     if (MIN <= t) {
         var x = int(t / MIN);
-        return x + ' minutes' + (1 < x ? 's' : '');
+        return x + ' minute' + (1 < x ? 's' : '');
     }
 
     if (t > 10) //t is greater than 10 seconds
