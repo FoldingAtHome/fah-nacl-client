@@ -887,7 +887,7 @@ function step_wu(total, count) {
 
     if (count % 5 == 0) {
         var now = new Date().valueOf();
-        if (now - lastProgressUpdate >= 1000) {
+        if (typeof lastProgressUpdate == 'undefined' || now - lastProgressUpdate >= 1000) {
             progress_update(count, eta);
             lastProgressUpdate = now;
         }
