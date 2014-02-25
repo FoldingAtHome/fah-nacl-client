@@ -82,13 +82,13 @@ function int(x) {
 var MIN = 60;
 var HOUR = 60 * MIN;
 var DAY = 24 * HOUR;
-var YEAR = 356 * DAY;
+var YEAR = 365 * DAY;
 
 function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
     var y = int((t % d1) / d2);
 
-    return x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
+    return 'about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
 
@@ -97,9 +97,15 @@ function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
-    if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
+    if (MIN <= t) {
+        var x = int(t / MIN);
+        return 'about ' + x + ' minute' + (1 < x ? 's' : '');
+    }
 
-    return t + ' second' + (1 < t ? 's' : '');
+    if (t > 10) //t is greater than 10 seconds
+        return "less than a minute"
+    else
+        return "a few seconds"
 }
 
 
@@ -617,7 +623,7 @@ function progress_update(current) {
         .text(percent);
 
     var eta = Math.floor(eta_update(current));
-    if (eta) $('#eta').text('Completion expected in about ' +
+    if (eta) $('#eta').text('Completion expected in ' +
                             human_time(eta)) + '.';
     else $('#eta').text('');
 }
@@ -696,7 +702,7 @@ function countdown(delay, call) {
         return;
     }
 
-    var delta = Math.min(250, delay);
+    var delta = Math.min(1000, delay);
     setTimeout(function () {countdown(delay - delta, call);}, delta);
 }
 
@@ -878,7 +884,14 @@ function step_wu(total, count) {
     status_set('running', 'Calculations underway.');
     fah.progress_total = total;
     var eta = (total - count) / 10; // TODO
-    progress_update(count, eta);
+
+    if (count % 5 == 0) {
+        var now = new Date().valueOf();
+        if (typeof lastProgressUpdate == 'undefined' || now - lastProgressUpdate >= 1000) {
+            progress_update(count, eta);
+            lastProgressUpdate = now;
+        }
+    }
 }
 
 
