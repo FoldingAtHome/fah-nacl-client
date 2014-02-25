@@ -884,7 +884,14 @@ function step_wu(total, count) {
     status_set('running', 'Calculations underway.');
     fah.progress_total = total;
     var eta = (total - count) / 10; // TODO
-    progress_update(count, eta);
+
+    if (count % 5 == 0) {
+        var now = new Date().valueOf();
+        if (now - lastProgressUpdate >= 1000) {
+            progress_update(count, eta);
+            lastProgressUpdate = now;
+        }
+    }
 }
 
 
