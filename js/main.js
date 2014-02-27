@@ -44,7 +44,6 @@ var fah = {
     last_stats: 0,
     last_progress_time: 0,
     last_progress_count: 0,
-    progress_stablize: 0,
     eta: [],
 
     projects: {},
@@ -97,12 +96,16 @@ function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
+
+    //if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
+    //return t + ' second' + (1 < t ? 's' : '');
+
     if (MIN <= t) {
         var x = int(t / MIN);
         return 'about ' + x + ' minute' + (1 < x ? 's' : '');
     }
 
-    return 10 < t ? 'less than a minute' : 'a few seconds';
+    return 15 < t ? 'less than a minute' : 'a few seconds';
 }
 
 
@@ -537,7 +540,7 @@ function eta_reset(clear) {
     $('#eta').text('');
     fah.last_progress_time = 0;
     fah.last_progress_count = 0;
-    fah.progress_stablize = 0;
+    fah.last_eta = 0;
 }
 
 
@@ -548,13 +551,21 @@ function eta_update(count) {
 
     if (0 < delta && fah.last_progress_time) {
         var sample = (now - fah.last_progress_time) / delta;
-        fah.eta = sample = fah.eta ? fah.eta * 0.98 + sample * 0.02 : sample;
-        if (0 < sample) eta = (fah.progress_total - count) * sample / 1000.0;
+        fah.eta = fah.eta ? fah.eta * 0.98 + sample * 0.02 : sample;
     }
+    if (0 < fah.eta) eta = (fah.progress_total - count) * fah.eta / 1000.0;
 
-    if (fah.progress_stablize && fah.progress_stablize - 0.9 < eta &&
-        eta < fah.progress_stablize + 0.9) eta = fah.progress_stablize;
-    else fah.progress_stablize = eta;
+    // Smooth out rapid changes on edges
+    if (fah.last_eta && fah.last_eta < eta) {
+        var small = 1;
+        if (YEAR <= fah.last_eta) small = DAY;
+        else if (DAY <= fah.last_eta) small = HOUR;
+        else if (HOUR <= fah.last_eta) small = MIN;
+        else if (MIN <= fah.last_eta) small = MIN;
+
+        if (eta - fah.last_eta <= 2 * small) eta = fah.last_eta;
+    }
+    fah.last_eta = eta;
 
     if (delta) fah.last_progress_time = now;
     fah.last_progress_count = count;
@@ -616,17 +627,17 @@ function progress_update(current) {
         return;
     }
 
-    if (fah.last_update == current) return;
-    fah.last_update = current;
-
     var percent = (current / fah.progress_total * 100).toFixed(1) + '%';
-    $('#progress div')
+    if (percent != fah.last_progress_percent_text)
+        $('#progress div')
         .css({width: percent, 'text-align': 'right', background: '#7a97c2'})
         .text(percent);
+    fah.last_progress_percent_text = percent;
 
     var eta = Math.floor(eta_update(current));
-    if (eta) $('#eta').text('Completion expected in ' + human_time(eta) + '.');
-    else $('#eta').text('');
+    eta = eta ? 'Completion expected in ' + human_time(eta) + '.' : '';
+    if (eta != fah.last_eta_text) $('#eta').text(eta);
+    fah.last_eta_text = eta;
 }
 
 
