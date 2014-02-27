@@ -1,7 +1,7 @@
 {
     "name": "Folding@home",
     "description": "Help scientists fight diseases, such as cancer, by donating your unused\ncomputing power by running Folding@home in a browser window.",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "author": "Stanford University",
     "manifest_version": 2,
     "icons": {

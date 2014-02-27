@@ -33,7 +33,7 @@ var fah = {
     stats_url: '//folding.stanford.edu/stats.py',
     project_url: '//folding.stanford.edu/project-jsonp.py',
 
-    max_project_brief: 600, // Maximum brief project description length
+    max_project_brief: 1000, // Maximum brief project description length
     min_delay: 15,
     max_delay: 15 * 60,
 
@@ -82,13 +82,13 @@ function int(x) {
 var MIN = 60;
 var HOUR = 60 * MIN;
 var DAY = 24 * HOUR;
-var YEAR = 356 * DAY;
+var YEAR = 365 * DAY;
 
 function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
     var y = int((t % d1) / d2);
 
-    return x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
+    return 'about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
 
@@ -97,9 +97,12 @@ function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
-    if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
+    if (MIN <= t) {
+        var x = int(t / MIN);
+        return 'about ' + x + ' minute' + (1 < x ? 's' : '');
+    }
 
-    return t + ' second' + (1 < t ? 's' : '');
+    return 10 < t ? 'less than a minute' : 'a few seconds';
 }
 
 
@@ -240,6 +243,8 @@ function module_progress(event) {
     var total = event.total ? event.total : 18000000;
     var percent = (event.loaded / total * 100.0).toFixed(1);
     var msg = percent + '%';
+
+    if (0 < percent) watchdog_clear();
 
     fah.progress_total = total;
     progress_update(event.loaded);
@@ -611,14 +616,16 @@ function progress_update(current) {
         return;
     }
 
+    if (fah.last_update == current) return;
+    fah.last_update = current;
+
     var percent = (current / fah.progress_total * 100).toFixed(1) + '%';
     $('#progress div')
         .css({width: percent, 'text-align': 'right', background: '#7a97c2'})
         .text(percent);
 
     var eta = Math.floor(eta_update(current));
-    if (eta) $('#eta').text('Completion expected in about ' +
-                            human_time(eta)) + '.';
+    if (eta) $('#eta').text('Completion expected in ' + human_time(eta) + '.');
     else $('#eta').text('');
 }
 
