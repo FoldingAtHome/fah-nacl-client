@@ -87,13 +87,13 @@ function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
     var y = int((t % d1) / d2);
 
-    return 'about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
+    return 'in about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
 
 
 function human_time(t) {
-    if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
+    if (YEAR <= t) return "soon. Please wait";
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
 
@@ -102,10 +102,10 @@ function human_time(t) {
 
     if (MIN <= t) {
         var x = int(t / MIN);
-        return 'about ' + x + ' minute' + (1 < x ? 's' : '');
+        return 'in about ' + x + ' minute' + (1 < x ? 's' : '');
     }
 
-    return 15 < t ? 'less than a minute' : 'a few seconds';
+    return 15 < t ? 'in less than a minute' : 'a few seconds';
 }
 
 
@@ -635,7 +635,7 @@ function progress_update(current) {
     fah.last_progress_percent_text = percent;
 
     var eta = Math.floor(eta_update(current));
-    eta = eta ? 'Completion expected in ' + human_time(eta) + '.' : '';
+    eta = eta ? 'Completion expected ' + human_time(eta) + '.' : '';
     if (eta != fah.last_eta_text) $('#eta').text(eta);
     fah.last_eta_text = eta;
 }
