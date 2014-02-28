@@ -635,7 +635,8 @@ function progress_update(current) {
     fah.last_progress_percent_text = percent;
 
     var eta = Math.floor(eta_update(current));
-    eta = eta ? 'Completion expected in ' + human_time(eta) + '.' : '';
+    if (!eta || YEAR <= eta) eta = '';
+    else eta = 'Completion expected in ' + human_time(eta) + '.';
     if (eta != fah.last_eta_text) $('#eta').text(eta);
     fah.last_eta_text = eta;
 }
