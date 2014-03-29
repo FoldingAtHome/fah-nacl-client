@@ -1,5 +1,5 @@
-fah-nacl-client
-===============
+Folding@home Google NaCl Client
+===============================
 
 This project contains the source code for the Open-Source frontend of
 the Folding@home NaCl Client.  This client requires the Google Chrome
