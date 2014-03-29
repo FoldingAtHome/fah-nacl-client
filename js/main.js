@@ -40,6 +40,7 @@ var fah = {
     pausing: false,
     paused: false,
     finish: false,
+    use_pnacl: false,
 
     last_stats: 0,
     last_progress_time: 0,
@@ -138,6 +139,16 @@ function str2ab(str) {
 }
 
 
+function get_query(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+
+    return results == null ? undefined :
+        decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+
 // Messages ********************************************************************
 function message_display(msg, timeout) {
     debug(msg);
@@ -170,7 +181,7 @@ function message_warn(msg, timeout) {
 
 
 // Dialogs *********************************************************************
-function dialog_open(name, closable) {
+function dialog_open(name, closable, buttons) {
     if (typeof closable == 'undefined') closable = true;
 
     var div = $('#' + name + '-dialog');
@@ -179,9 +190,11 @@ function dialog_open(name, closable) {
     if (typeof width == 'undefined' || width == '0px') width = '500px';
     fah.dialog_widths[name] = width;
 
-    var buttons;
-    if (closable)
-        buttons = [{text: 'Ok', click: function () {$(this).dialog('close');}}];
+    if (closable) {
+        if (typeof buttons == 'undefined') buttons = [];
+        buttons = buttons.concat([
+            {text: 'Ok', click: function () {$(this).dialog('close');}}]);
+    }
 
     div.dialog({
         modal: true, closeOnEscape: closable, width: width,
@@ -232,11 +245,23 @@ function watchdog_clear() {
 
 
 // NaCl ************************************************************************
+function module_insert() {
+    var attrs;
+
+    if (fah.use_pnacl)
+        attrs = {src: 'fahcore_b0-pnacl.nmf', type: 'application/x-pnacl'};
+    else attrs = {src: 'fahcore_b0.nmf', type: 'application/x-nacl'};
+
+    $('#fahcore').html($('<embed>').attr(attrs));
+}
+
+
 function module_loading() {
     watchdog_kick();
     debug("NaCl module loading");
     status_set('downloading', 'Downloading the Folding@home software in your ' +
                'Web browser.  On your first visit this can take awhile.');
+    return false;
 }
 
 
@@ -254,6 +279,7 @@ function module_progress(event) {
 
     debug('load progress: ' + msg + ' (' + event.loaded + ' of ' + total +
           ' bytes)');
+    return false;
 }
 
 
@@ -266,14 +292,16 @@ function module_loaded() {
     watchdog_set(30000, module_load_failed);
 
     debug("NaCl module loaded");
-    fah.nacl = document.getElementById('fahcore');
+    fah.nacl = $('#fahcore embed').get(0);
     post_message('ping');
+    return false;
 }
 
 
 function module_exit() {
     debug('Module exit');
-    $('#fahcore').replaceWith($('#fahcore'));
+    module_insert();
+    return false;
 }
 
 
@@ -288,7 +316,7 @@ function post_message(msg) {
 }
 
 
-function handle_message(event) {
+function module_message(event) {
     var cmd = (typeof event.data == 'string') ? event.data : event.data[0];
 
     switch (true) {
@@ -307,11 +335,21 @@ function handle_message(event) {
     case cmd == 'unpaused': folding_unpaused(); break;
     default: debug(event.data); break;
     }
+
+    return false;
 }
 
 
 function module_error(event) {
-    message_warn('NaCl module failure, fatal', 0);
+    if (fah.use_pnacl) message_warn('PNaCl module failure, fatal', 0);
+
+    else {
+        debug('NaCl module failure, trying PNaCl');
+        fah.use_pnacl = true;
+        module_insert();
+    }
+
+    return false;
 }
 
 
@@ -884,6 +922,7 @@ function start_wu(data) {
     fah.wu = wu;
     fah.wu_signature = data[2];
     fah.finish = false;
+    fah.wu_start = new Date().valueOf();
 
     status_set('running', 'Starting work unit.');
     progress_start(0);
@@ -902,6 +941,9 @@ function step_wu(total, count) {
 
 
 function finish_wu(results, signature, data) {
+    var t = new Date().valueOf() - fah.wu_start;
+    debug('WU took ' + t + ' seconds');
+
     status_set('uploading', 'Uploading results.');
     fah.results = JSON.parse(results);
     fah.signature = signature;
@@ -990,7 +1032,7 @@ function wu_retry() {
 
 function wu_complete() {
     delete fah.wu;
-    post_message(['exit']);
+    module_insert();
 }
 
 
@@ -1041,7 +1083,39 @@ function unpause_folding() {
 
 
 // Identity ********************************************************************
+function change_teams() {
+    fah.team = parseInt(get_query('team'));
+    config_set('team', fah.team);
+    $('input.team').val(fah.team);
+
+    message_display('Changed teams');
+    stats_load();
+
+    location.search = '';
+    $(this).dialog('close');
+}
+
+
+function dont_change_teams() {
+    location.search = '';
+    $(this).dialog('close');
+}
+
+
 function load_identity() {
+    // Handle URL team
+    try {
+        var url_team = parseInt(get_query('team'));
+        if (url_team) {
+            if (!config_has('team')) config_set('team', url_team);
+            else if (url_team != parseInt(config_get('team')))
+                dialog_open('change-teams', false, [
+                    {text: 'Yes, please', click: change_teams},
+                    {text: 'No, thanks', click: dont_change_teams},
+                ]);
+        }
+    } catch (e) {} // Ignore
+
     if (config_has('user')) {
         $('input.user').val(fah.user = config_get('user'));
         config_set('user', config_get('user')); // Extend expiration
@@ -1165,4 +1239,19 @@ $(function () {
         if (e) e.returnValue = message; // For IE and Firefox
         return message; // For Safari
     };
+
+    // Start Module
+    var core = document.getElementById('fahcore');
+    core.addEventListener('loadstart', module_loading, true);
+    core.addEventListener('progress', module_progress, true);
+    core.addEventListener('load', module_loaded, true);
+    core.addEventListener('message', module_message, true);
+    core.addEventListener('error', module_error, true);
+    core.addEventListener('crash', module_exit, true);
+
+    module_insert();
+
+    // Google analytics
+    _uacct = "UA-2993490-3";
+    urchinTracker();
 });

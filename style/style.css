@@ -254,6 +254,10 @@ a.desktop {color: #42c0fb;}
 
 #power-slider #slider {height: 1em;}
 
+.ui-button {
+    white-space: nowrap;
+}
+
 .ui-slider .ui-slider-handle {
     background: url(../images/slider.png) no-repeat !important;
     width: 28px;
@@ -379,8 +383,7 @@ a.desktop {color: #42c0fb;}
 }
 
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
-    float: none;
-    width: 4em;
+    float: right;
     margin: auto;
 }
 
@@ -458,8 +461,8 @@ img.bug-icon {
 img.icon {float: right;}
 
 .ui-widget-overlay {
-    opacity: 0.6;
-    filter: alpha(opacity = 60);
+    opacity: 0.4;
+    filter: alpha(opacity = 40);
     background: #000;
 }
 
