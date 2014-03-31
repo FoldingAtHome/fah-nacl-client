@@ -269,7 +269,10 @@ function module_loading() {
 function module_progress(event) {
     watchdog_kick();
 
-    var total = event.total ? event.total : 18000000;
+    var default_total = 18000000;
+    var total = event.total ? event.total : default_total;
+    if (default_total * 100 < total ) total = default_total // Sanity check
+
     var percent = (event.loaded / total * 100.0).toFixed(1);
     var msg = percent + '%';
 
