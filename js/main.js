@@ -253,6 +253,7 @@ function module_insert() {
     else attrs = {src: 'fahcore_b0.nmf', type: 'application/x-nacl'};
 
     $('#fahcore').html($('<embed>').attr(attrs));
+    var x = $('#fahcore embed').get(0).offsetTop; // Chrome Hack
 }
 
 
@@ -346,6 +347,7 @@ function module_error(event) {
     else {
         debug('NaCl module failure, trying PNaCl');
         fah.use_pnacl = true;
+        watchdog_kick();
         module_insert();
     }
 
@@ -1173,7 +1175,7 @@ function save_identity(e) {
 
 // Init ************************************************************************
 $(function () {
-    watchdog_set(5000, module_timeout);
+    watchdog_set(10000, module_timeout);
 
     // Use local AS for development
     if (document.location.host == 'localhost')
