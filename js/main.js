@@ -193,8 +193,10 @@ function intercom_init() {
 
         switch (data.cmd) {
         case 'pause':
-            message_warn('Another instance was started, pausing');
-            pause_folding(false);
+            if (!fah.pausing) {
+                message_warn('Another instance was started, pausing');
+                pause_folding(false);
+            }
             break;
 
         case 'hello':
@@ -244,7 +246,11 @@ function dialog_open_event(e) {
 
 
 function dialog_open_fatal(name) {
-    dialog_open(name, false);
+    buttons = [
+        {text: 'Reload', click: function () {
+            window.location = window.location;
+        }}];
+    dialog_open(name, false, buttons);
     delete fah.wu;
 }
 
@@ -1242,9 +1248,6 @@ $(function () {
     // Make sure there is only one instance running
     intercom_init();
 
-    // Start module watchdog
-    watchdog_set(10000, module_timeout);
-
     // Use local AS for development
     if (document.location.host == 'localhost')
         fah.as_url = 'http://localhost:8888';
@@ -1311,20 +1314,36 @@ $(function () {
             return message; // For Safari
         };
 
-    // Start Module
-    var core = document.getElementById('fahcore');
-    core.addEventListener('loadstart', module_loading, true);
-    core.addEventListener('progress', module_progress, true);
-    core.addEventListener('load', module_loaded, true);
-    core.addEventListener('message', module_message, true);
-    core.addEventListener('error', module_error, true);
-    core.addEventListener('crash', module_exit, true);
+    if (window.chrome) {
+        // Start module watchdog
+        watchdog_set(10000, module_timeout);
 
-    module_insert();
+        // Start Module
+        var core = document.getElementById('fahcore');
+        core.addEventListener('loadstart', module_loading, true);
+        core.addEventListener('progress', module_progress, true);
+        core.addEventListener('load', module_loaded, true);
+        core.addEventListener('message', module_message, true);
+        core.addEventListener('error', module_error, true);
+        core.addEventListener('crash', module_exit, true);
 
-    // Google analytics
-    _uacct = "UA-2993490-3";
-    urchinTracker();
+        module_insert();
+
+    } else if (fah.micro) {
+        stats_load();
+        $('#micro #control')
+            .html($('<a>')
+                  .attr('href', 'http://google.com/chrome')
+                  .append($('<img>')
+                          .attr({src: 'images/chrome.png',
+                                 width: '24px'})
+                          .css('float', 'left'))
+                  .append('Requires Google Chrome')
+                 )
+            .css({'font-weight': 'bold', 'top': '0px',
+                  'line-height': '0.9em', 'font-size': '9pt'});
+
+    } else dialog_open_fatal('requires-chrome');
 
     if (fah.micro) {
         // User colors
@@ -1348,4 +1367,8 @@ $(function () {
 
         intercom_emit('hello');
     }
+
+    // Google analytics
+    _uacct = "UA-2993490-3";
+    if (typeof urchinTracker != 'undefined') urchinTracker();
 });
