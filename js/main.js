@@ -459,8 +459,7 @@ function stats_update(data) {
 
         if (stats.team_name) {
             team_name.append(', "').append(stats.team_name).append('", ');
-            $('#micro').attr('title', 'Running Folding@home for team ' +
-                             stats.team_name);
+            $('#micro').attr('title', 'Folding for team ' + stats.team_name);
             fah.team_name = stats.team_name;
         }
 

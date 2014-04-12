@@ -21,8 +21,8 @@ in your Web page.
 
 The simplest way is to just add the following HTML code to your page:
 
-    <iframe src="http://folding.stanford.edu/nacl/micro.html" width="128"
-      height="48"></iframe>
+    <iframe src="http://folding.stanford.edu/nacl/micro.html"
+      scrolling="no" frameBorder="0" width="132" height="52"></iframe>
 
 However, you can also add some configuration options:
 
@@ -34,11 +34,20 @@ However, you can also add some configuration options:
 
 These options can be added as URL parameters.  For example:
 
-    <iframe src="http://folding.stanford.edu/nacl/micro.html?team=1&fg=0f0"
-      width="128" height="64"></iframe>
+    <iframe src="http://folding.stanford.edu/nacl/micro.html?team=1&power=full"
+      scrolling="no" frameBorder="0" width="132" height="68"></iframe>
 
-Note, that if you specify a team the height should be 64 rather than 48 to
+Note, that if you specify a team the height should be 68 rather than 52 to
 make room for the team points display.
+
+You may also want to move the widget out of the way by adding a style attribute
+like this:
+
+    <iframe src="http://folding.stanford.edu/nacl/micro.html?team=1&power=full"
+      scrolling="no" frameBorder="0" width="132" height="68"
+      style="float:right"></iframe>
+
+See also: `example.html`
 
 # Contact
 Email joseph@cauldrondevelopment.com for more info.
