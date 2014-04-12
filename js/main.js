@@ -360,11 +360,15 @@ function module_error(event) {
 
 
 // Config **********************************************************************
+function config_key(name) {
+    return 'fah_' + (fah.micro ? 'micro_' : '') + name;
+}
+
+
 function config_set(key, value, expires) {
     if (typeof(expires) == 'undefined') expires = 100 * 365;
 
-    $.cookie('fah_' + (fah.micro ? 'micro_' : '') + key, value,
-             {expires: expires});
+    $.cookie(config_key(key), value, {expires: expires});
 
     if (key == 'passkey') value = '********************************';
     debug('Config: ' + key + ' = ' + value);
@@ -375,17 +379,17 @@ function config_get(key, defaultValue) {
     if (typeof(defaultValue) != 'undefined' && !config_has(key))
         return defaultValue;
 
-    return $.cookie('fah_' + key);
+    return $.cookie(config_key(key));
 }
 
 
 function config_has(key) {
-    return typeof($.cookie('fah_' + key)) != 'undefined';
+    return typeof(config_get(key)) != 'undefined';
 }
 
 
 function config_del(key) {
-    $.removeCookie('fah_' + key);
+    $.removeCookie(config_key(key));
     debug('Config: deleted ' + key);
 }
 
@@ -628,6 +632,8 @@ function eta_update(count) {
 
 
 function power_init() {
+    if (fah.micro) return;
+
     var slider = $('#slider');
     slider.slider({
         min: 1, max: 3, range: "min", value: 1,
