@@ -194,7 +194,7 @@ function intercom_init() {
         switch (data.cmd) {
         case 'pause':
             message_warn('Another instance was started, pausing');
-            pause_folding();
+            pause_folding(false);
             break;
 
         case 'hello':
@@ -877,9 +877,8 @@ function wu_return(server, success, error) {
 // State Transitions ***********************************************************
 function init() {
     if (fah.finish) {
-        pause_folding();
+        pause_folding(false);
         progress_update(0);
-        config_del('paused');
     }
 
     backoff_reset();
@@ -1114,10 +1113,11 @@ function folding_paused() {
 }
 
 
-function pause_folding() {
+function pause_folding(save) {
     if (fah.pausing) return;
     fah.pausing = true;
-    config_set('paused', true);
+
+    if (typeof save == 'undefined' || save) config_set('paused', true);
 
     $('.folding-stop').hide();
     $('.folding-start').show();
@@ -1259,7 +1259,7 @@ $(function () {
                              function() {$(this).attr('type', 'password');});
 
     // Restore state
-    if (config_get('paused')) pause_folding();
+    if (config_get('paused')) pause_folding(false);
     load_identity();
 
     // Power slider
