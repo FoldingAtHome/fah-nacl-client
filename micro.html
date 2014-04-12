@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!--
+              This file is part of the Folding@home NaCl Client
+
+        Copyright (c) 2013-2014, Hong Kong University Science & Technology
+               Copyright (c) 2013-2014, Stanford University
+                             All rights reserved.
+
+        This software is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Lesser General Public License
+        as published by the Free Software Foundation, either version 2.1 of
+        the License, or (at your option) any later version.
+
+        This software is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public
+        License along with this software.  If not, see
+        <http://www.gnu.org/licenses/>.
+
+                For information regarding this software email:
+                               Joseph Coffland
+                        joseph@cauldrondevelopment.com
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="author" content="Joseph Coffland">
+
+    <title>Folding@home Chrome Micro Client</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico"/>
+
+    <!-- Facebook Open Graph Tags -->
+    <meta property="og:image"
+          content="http://folding.stanford.edu/nacl/images/fah-logo.png"/>
+    <meta property="og:url"
+          content="http://folding.stanford.edu/nacl/"/>
+    <meta property="og:title" content="Folding@home Web App"/>
+    <meta property="og:description"
+          content="Run Folding@home in your browser with Google Chrome."/>
+
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="style/jquery-ui.min.css"/>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="https://apis.google.com/js/plusone.js"></script>
+    <script src="js/intercom.min.js"></script>
+    <script src="http://www.google-analytics.com/urchin.js"></script>
+    <link rel="stylesheet" href="style/style.css"/>
+    <link rel="stylesheet" href="style/micro.css"/>
+    <script src="js/main.js"></script>
+  </head>
+
+  <body>
+    <a href="http://folding.stanford.edu/">
+      <div id="micro">
+        <div id="header">
+          Folding<span class="at">@</span>home
+        </div>
+
+        <div id="micro-points">
+          <img src="images/micro/points.png"/>
+          <span class="team-points">loading...</span>
+        </div>
+
+        <div id="control">
+          <div title="Click to start folding" class="folding-start">
+            <div class="button"></div>
+          </div>
+          <div title="Click to pause folding" class="folding-stop">
+            <div class="button"></div>
+          </div>
+          <div id="status">
+            <div id="status-image" class="stopped"></div>
+            <div title="Progress of current operation"
+                 id="progress"><div></div></div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </body>
+
+  <div id="fahcore"></div>
+</html>

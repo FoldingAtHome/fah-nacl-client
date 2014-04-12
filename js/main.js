@@ -37,6 +37,7 @@ var fah = {
     min_delay: 15,
     max_delay: 15 * 60,
 
+    micro: false,
     pausing: false,
     paused: false,
     finish: false,
@@ -362,7 +363,8 @@ function module_error(event) {
 function config_set(key, value, expires) {
     if (typeof(expires) == 'undefined') expires = 100 * 365;
 
-    $.cookie('fah_' + key, value, {expires: expires});
+    $.cookie('fah_' + (fah.micro ? 'micro_' : '') + key, value,
+             {expires: expires});
 
     if (key == 'passkey') value = '********************************';
     debug('Config: ' + key + ' = ' + value);
@@ -438,6 +440,7 @@ function stats_update(data) {
         user.append(' points.');
     }
 
+    fah.team_name = '' + fah.team;
     if (fah.team == 0) team.append('Consider joining a team.');
     else {
         var team_name;
@@ -450,8 +453,12 @@ function stats_update(data) {
 
         team_name.append('Your team');
 
-        if (stats.team_name)
+        if (stats.team_name) {
             team_name.append(', "').append(stats.team_name).append('", ');
+            $('#micro').attr('title', 'Running Folding@home for team ' +
+                             stats.team_name);
+            fah.team_name = stats.team_name;
+        }
 
         team.append(team_name);
 
@@ -466,6 +473,9 @@ function stats_update(data) {
     }
 
     $('#points').html(user).append(' ').append(team);
+    $('.team-points')
+        .text(human_number(stats.team_total))
+        .attr('title', 'Total points earned by team ' + fah.team_name);
 }
 
 
@@ -554,7 +564,7 @@ function project_update(data) {
 
 
 function project_load(id) {
-    if (!id) return;
+    if (!id || fah.micro) return;
 
     if (id in fah.projects) {
         project_show(id);
@@ -664,7 +674,8 @@ function progress_start(total) {
 function progress_update(current) {
     if (fah.pausing) {
         $('#progress div')
-            .css({width: '100%', 'text-align': 'center', background: '#fff276'})
+            .css({width: '100%'})
+            .addClass('paused')
             .text('Paused');
         eta_reset(false);
         return;
@@ -673,7 +684,8 @@ function progress_update(current) {
     var percent = (current / fah.progress_total * 100).toFixed(1) + '%';
     if (percent != fah.last_progress_percent_text)
         $('#progress div')
-        .css({width: percent, 'text-align': 'right', background: '#7a97c2'})
+        .css({width: percent})
+        .removeClass('paused')
         .text(percent);
     fah.last_progress_percent_text = percent;
 
@@ -703,8 +715,10 @@ function status_set(status, msg) {
     }
 
     if (!fah.paused) {
-        $('#status-image').removeClass();
-        $('#status-image').addClass(status);
+        $('#status-image')
+            .removeClass()
+            .addClass(status)
+            .attr('title', msg);
         $('#status-text').text(msg);
     }
 }
@@ -774,7 +788,7 @@ function server_call(url, data, success, error, upload, download) {
 
     if (typeof data == 'undefined') data = {};
     data.version = fah.version;
-    data.type = 'NACL';
+    data.type = 'NACL' + (fah.micro ? '_MICRO' : '');
     data.os = 'NACL';
     data.user = fah.user;
     data.team = fah.team;
@@ -1071,6 +1085,8 @@ function pause_folding() {
     $('.folding-start').show();
 
     post_message(['pause']);
+
+    return false;  // Prevent default action
 }
 
 
@@ -1084,6 +1100,8 @@ function unpause_folding() {
     $('.folding-stop').show();
 
     post_message(['unpause']);
+
+    return false; // Prevent default action
 }
 
 
@@ -1096,7 +1114,6 @@ function change_teams() {
     message_display('Changed teams');
     stats_load();
 
-    location.search = '';
     $(this).dialog('close');
 }
 
@@ -1112,7 +1129,8 @@ function load_identity() {
     try {
         var url_team = parseInt(get_query('team'));
         if (url_team) {
-            if (!config_has('team')) config_set('team', url_team);
+            if (fah.micro) change_teams();
+            else if (!config_has('team')) config_set('team', url_team);
             else if (url_team != parseInt(config_get('team')))
                 dialog_open('change-teams', false, [
                     {text: 'Yes, please', click: change_teams},
@@ -1120,6 +1138,8 @@ function load_identity() {
                 ]);
         }
     } catch (e) {} // Ignore
+
+    if (fah.micro) return;
 
     if (config_has('user')) {
         $('input.user').val(fah.user = config_get('user'));
@@ -1142,6 +1162,7 @@ function load_identity() {
 
 function save_identity(e) {
     if (typeof e != 'undefined') e.preventDefault();
+    if (fah.micro) return;
 
     var errors = []
 
@@ -1178,6 +1199,8 @@ function save_identity(e) {
 
 // Init ************************************************************************
 $(function () {
+    fah.micro = 0 < $('#micro').length;
+
     watchdog_set(10000, module_timeout);
 
     // Use local AS for development
@@ -1229,21 +1252,22 @@ $(function () {
                           share_url + '&t=' + share_text});
 
     // Catch exit
-    window.onbeforeunload = function (e) {
-        if (fah.paused || typeof fah.wu == 'undefined')
-            return;
+    if (!fah.micro)
+        window.onbeforeunload = function (e) {
+            if (fah.paused || typeof fah.wu == 'undefined')
+                return;
 
-        var message = 'If you choose to stay on this page Folding@home will ' +
-            'finish its current work and then pause.  You can then leave ' +
-            'with out losing any work.';
+            var message = 'If you choose to stay on this page Folding@home ' +
+                'will finish its current work and then pause.  You can then ' +
+                'leave with out losing any work.';
 
-        fah.finish = true;
-        message_display('Finishing current work unit', 30);
+            fah.finish = true;
+            message_display('Finishing current work unit', 30);
 
-        e = e || window.event;
-        if (e) e.returnValue = message; // For IE and Firefox
-        return message; // For Safari
-    };
+            e = e || window.event;
+            if (e) e.returnValue = message; // For IE and Firefox
+            return message; // For Safari
+        };
 
     // Start Module
     var core = document.getElementById('fahcore');
@@ -1259,4 +1283,20 @@ $(function () {
     // Google analytics
     _uacct = "UA-2993490-3";
     urchinTracker();
+
+    if (fah.micro) {
+        // User colors
+        var bg = get_query('bg');
+        if (typeof bg != 'undefined')
+            $('#micro').css('background-color', '#' + bg);
+
+        var fg = get_query('fg');
+        if (typeof fg != 'undefined')
+            $('#micro').css('color', '#' + fg);
+
+        if (!fah.team) {
+            $('#micro-points').css('display', 'none');
+            $('#micro').css('height', '48px');
+        }
+    }
 });

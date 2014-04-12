@@ -1,0 +1,136 @@
+body {
+    width: 128px;
+    font-size: 10pt;
+    background: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+img {
+    vertical-align: middle;
+}
+
+#micro {
+    width: 128px;
+    height: 64px;
+    background: #444;
+    padding: 2px;
+    border-radius: 6px;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+}
+
+
+#header {
+    width: inherit;
+    height: initial;
+    background-image: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#header .at {
+    color: #d44;
+}
+
+#micro-points {
+    font-size: 8pt;
+    white-space: nowrap;
+}
+
+.team-points {
+    font-size: 10pt;
+}
+
+#control {
+    position: relative;
+    top: 14px;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    float: inherit;
+}
+
+#status-image {
+    width: 24px;
+    height: 24px;
+    border: none;
+    margin-right: 2px;
+    margin-top: -2px;
+    float: left;
+}
+
+#status-image.running {
+    background: url('../images/micro/running.gif') no-repeat 0px 0px #64ca7d;
+}
+
+#status-image.uploading {
+    background: url('../images/micro/upload.gif') no-repeat 0px 0px #64ca7d;
+}
+
+#status-image.downloading {
+    background: url('../images/micro/download.gif') no-repeat 0px 4px #64ca7d;
+}
+
+#status-image.waiting {
+    background: url('../images/micro/error.png') no-repeat 0px 0px transparent;
+}
+
+#status-image.error {
+    background: url('../images/micro/error.png') no-repeat 0px 0px transparent;
+}
+
+#status-image.stopped {
+    background: url('../images/micro/stopped.png') no-repeat 0px 0px #ff0000;
+}
+
+#status-image.pausing {
+    background: url('../images/micro/paused.gif') no-repeat 0px 0px #fff276;
+}
+
+#status-image.paused {
+    background: url('../images/micro/paused.png') no-repeat 0px 0px #fff276;
+}
+
+#status-image.finished {
+    background: url('../images/micro/paused.png') no-repeat 0px 0px #fff276;
+}
+
+#progress {
+    color: #000;
+    border: none;
+}
+
+#progress div {
+    background: #bbb;
+}
+
+.folding-start .button, .folding-stop .button {
+    width: 24px;
+    height: 24px;
+    border: none;
+    float: right;
+    margin-left: 2px;
+    margin-top: -2px;
+}
+
+.folding-start .button {
+    background: url('../images/power.png') no-repeat 4px 3px;
+    background-color: inherit;
+}
+
+.folding-start .button:hover {background-color: #2c9345;}
+
+.folding-stop .button {
+    background: url('../images/power.png') no-repeat 4px 3px;
+    background-color: inherit;
+}
+
+.folding-stop .button:hover {background-color: #ca2b2c;}
+
+.message {
+    display: none;
+}
