@@ -1300,6 +1300,11 @@ $(function () {
         if (typeof fg != 'undefined')
             $('#micro').css('color', '#' + fg);
 
+        // Power
+        var power = get_query('power');
+        if (typeof power != 'undefined') power_set(power);
+
+        // Team
         if (!fah.team) {
             $('#micro-points').css('display', 'none');
             $('#micro').css('height', '48px');

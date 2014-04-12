@@ -28,6 +28,7 @@ However, you can also add some configuration options:
 
  - *team* - Your team number.  This will cause the points earned by visitors
    to your page to be contributed to your team.
+ - *power* - May be one of *light*, *medium* or *full*.  Defaults to *medium*.
  - *fg* - Set the foreground color.  Must be a 3 or 6 digit hexadecimal number.
  - *bg* - Set the background color.  Must be a 3 or 6 digit hexadecimal number.
 
