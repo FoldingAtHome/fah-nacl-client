@@ -29,6 +29,9 @@ var fah = {
     user: 'Anonymous',
     team: 0,
 
+    intercom_id: 'fah-nacl-client',
+    timestamp: new Date().getTime(),
+
     as_url: 'http://assign5.stanford.edu',
     stats_url: '//folding.stanford.edu/stats.py',
     project_url: '//folding.stanford.edu/project-jsonp.py',
@@ -178,6 +181,33 @@ function message_display(msg, timeout) {
 function message_warn(msg, timeout) {
     if (typeof timeout == 'undefined') timeout = 30;
     message_display('Warning: ' + msg, timeout);
+}
+
+
+// Intercom ********************************************************************
+function intercom_init() {
+    var intercom = Intercom.getInstance();
+
+    intercom.on(fah.intercom_id, function(data) {
+        if (data.ts == fah.timestamp) return;
+
+        switch (data.cmd) {
+        case 'pause':
+            message_warn('Another instance was started, pausing');
+            pause_folding();
+            break;
+
+        case 'hello':
+            if (!fah.pausing) intercom_emit('pause');
+            break;
+        }
+    });
+}
+
+
+function intercom_emit(cmd) {
+    var intercom = Intercom.getInstance();
+    intercom.emit(fah.intercom_id, {ts: fah.timestamp, cmd: cmd});
 }
 
 
@@ -953,6 +983,8 @@ function start_wu(data) {
     post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
                   str2ab(data[4])]);
     post_message(['power', config_get('power')]);
+
+    intercom_emit('pause'); // Tell other instances to pause
 }
 
 
@@ -1063,6 +1095,7 @@ function wu_complete() {
 function folding_unpaused() {
     fah.paused = false;
     status_unpause();
+    intercom_emit('pause'); // Tell other instances to pause
 }
 
 
@@ -1206,6 +1239,10 @@ function save_identity(e) {
 $(function () {
     fah.micro = 0 < $('#micro').length;
 
+    // Make sure there is only one instance running
+    intercom_init();
+
+    // Start module watchdog
     watchdog_set(10000, module_timeout);
 
     // Use local AS for development
@@ -1308,5 +1345,7 @@ $(function () {
             $('#micro-points').css('display', 'none');
             $('#micro').css('height', '48px');
         }
+
+        intercom_emit('hello');
     }
 });
