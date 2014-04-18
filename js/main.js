@@ -92,7 +92,7 @@ function human_time_slice(t, d1, n1, d2, n2) {
     var x = int(t / d1);
     var y = int((t % d1) / d2);
 
-    return 'about ' + x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
+    return x + ' ' + n1 + (1 < x ? 's' : '') + ' and ' +
         y + ' ' + n2 + (1 < y ? 's' : '');
 }
 
@@ -101,9 +101,13 @@ function human_time(t) {
     if (YEAR <= t) return human_time_slice(t, YEAR, 'year', DAY, 'day');
     if (DAY <= t) return human_time_slice(t, DAY, 'day', HOUR, 'hour');
     if (HOUR <= t) return human_time_slice(t, HOUR, 'hour', MIN, 'minute');
+    if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
+    return t + ' second' + (1 < t ? 's' : '');
+}
 
-    //if (MIN <= t) return human_time_slice(t, MIN, 'minute', 1, 'second');
-    //return t + ' second' + (1 < t ? 's' : '');
+
+function friendly_time(t) {
+    if (HOUR <= t) return 'about ' + human_time(t);
 
     if (MIN <= t) {
         var x = int(t / MIN);
@@ -732,7 +736,7 @@ function progress_update(current) {
 
     var eta = Math.floor(eta_update(current));
     if (!eta || YEAR <= eta) eta = '';
-    else eta = 'Completion expected in ' + human_time(eta) + '.';
+    else eta = 'Completion expected in ' + friendly_time(eta) + '.';
     if (eta != fah.last_eta_text) $('#eta').text(eta);
     fah.last_eta_text = eta;
 }
@@ -1002,8 +1006,8 @@ function step_wu(total, count) {
 
 
 function finish_wu(results, signature, data) {
-    var t = new Date().valueOf() - fah.wu_start;
-    debug('WU took ' + t + ' seconds');
+    var t = int((new Date().valueOf() - fah.wu_start) / 1000);
+    debug('WU took ' + human_time(t));
 
     status_set('uploading', 'Uploading results.');
     fah.results = JSON.parse(results);
