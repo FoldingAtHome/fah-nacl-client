@@ -302,7 +302,7 @@ function module_loading() {
     watchdog_kick();
     debug("NaCl module loading");
     status_set('downloading', 'Downloading the Folding@home software in your ' +
-               'Web browser.  On your first visit this can take awhile.');
+               'Web browser.  On your first visit this can take a while.');
     return false;
 }
 
