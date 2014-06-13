@@ -29,6 +29,9 @@ var fah = {
     user: 'Anonymous',
     team: 0,
 
+    chrome_version:
+    parseFloat(window.navigator.appVersion.match(/Chrome\/(\d+\.\d+)/)[1]),
+
     intercom_id: 'fah-nacl-client',
     timestamp: new Date().getTime(),
 
@@ -44,6 +47,7 @@ var fah = {
     pausing: false,
     paused: false,
     finish: false,
+    use_simd: false,
     use_pnacl: false,
 
     last_stats: 0,
@@ -289,7 +293,9 @@ function watchdog_clear() {
 function module_insert() {
     var attrs;
 
-    if (fah.use_pnacl)
+    if (fah.use_simd)
+        attrs = {src: 'fahcore_b0-simd.nmf', type: 'application/x-pnacl'};
+    else if (fah.use_pnacl)
         attrs = {src: 'fahcore_b0-pnacl.nmf', type: 'application/x-pnacl'};
     else attrs = {src: 'fahcore_b0.nmf', type: 'application/x-nacl'};
 
@@ -300,7 +306,13 @@ function module_insert() {
 
 function module_loading() {
     watchdog_kick();
-    debug("NaCl module loading");
+
+    var name;
+    if (fah.use_simd) name = 'SIMD PNaCl';
+    else if (fah.use_pnacl) name = 'PNaCl';
+    else name = 'NaCl';
+
+    debug(name + ' module loading');
     status_set('downloading', 'Downloading the Folding@home software in your ' +
                'Web browser.  On your first visit this can take a while.');
     return false;
@@ -388,7 +400,13 @@ function module_message(event) {
 function module_error(event) {
     if (fah.use_pnacl) message_warn('PNaCl module failure, fatal', 0);
 
-    else {
+    else if (fah.use_simd) {
+        debug('SIMD PNaCl module failure, trying NaCl');
+        fah.use_simd = false;
+        watchdog_kick();
+        module_insert();
+
+    } else {
         debug('NaCl module failure, trying PNaCl');
         fah.use_pnacl = true;
         watchdog_kick();
@@ -1319,6 +1337,15 @@ $(function () {
         };
 
     if (window.chrome) {
+        debug('Detected Chrome version ' + fah.chrome_version);
+
+        if (fah.chrome_version < 31) {
+            dialog_open_fatal('nacl-error-dialog');
+            return;
+        }
+
+        fah.use_simd = 35 < fah.chrome_version;
+
         // Start module watchdog
         watchdog_set(10000, module_timeout);
 
