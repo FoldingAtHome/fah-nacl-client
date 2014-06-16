@@ -29,9 +29,6 @@ var fah = {
     user: 'Anonymous',
     team: 0,
 
-    chrome_version:
-    parseFloat(window.navigator.appVersion.match(/Chrome\/(\d+\.\d+)/)[1]),
-
     intercom_id: 'fah-nacl-client',
     timestamp: new Date().getTime(),
 
@@ -1276,6 +1273,7 @@ $(function () {
     else if (document.location.host == '127.0.0.1')
         fah.as_url = 'http://127.0.0.1:8888';
 
+
     // Open all links in new tab
     $('a').attr('target', '_blank');
 
@@ -1337,6 +1335,9 @@ $(function () {
         };
 
     if (window.chrome) {
+        // Get Chrome version
+        fah.chrome_version =
+            parseFloat(navigator.appVersion.match(/Chrome\/(\d+\.\d+)/)[1]),
         debug('Detected Chrome version ' + fah.chrome_version);
 
         if (fah.chrome_version < 31) {
