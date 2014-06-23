@@ -1337,7 +1337,7 @@ $(function () {
     if (window.chrome) {
         // Get Chrome version
         fah.chrome_version =
-            parseFloat(navigator.appVersion.match(/Chrome\/(\d+\.\d+)/)[1]),
+            parseFloat(navigator.appVersion.match(/Chrome\/(\d+\.\d+)/)[1]);
         debug('Detected Chrome version ' + fah.chrome_version);
 
         if (fah.chrome_version < 31) {
@@ -1345,7 +1345,7 @@ $(function () {
             return;
         }
 
-        fah.use_simd = 35 < fah.chrome_version;
+        fah.use_simd = 36 < fah.chrome_version;
 
         // Start module watchdog
         watchdog_set(10000, module_timeout);
