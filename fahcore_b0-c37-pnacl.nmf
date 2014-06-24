@@ -2,7 +2,7 @@
   "program": {
     "portable": {
       "pnacl-translate": {
-        "url": "fahcore_b0-pnacl.pexe"
+        "url": "fahcore_b0-v2-c37.pexe"
       }
     }
   }

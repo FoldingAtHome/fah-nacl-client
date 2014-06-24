@@ -1,0 +1,9 @@
+{
+  "program": {
+    "portable": {
+      "pnacl-translate": {
+        "url": "fahcore_b0-v2-c36.pexe"
+      }
+    }
+  }
+}

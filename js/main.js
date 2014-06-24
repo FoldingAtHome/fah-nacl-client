@@ -44,7 +44,6 @@ var fah = {
     pausing: false,
     paused: false,
     finish: false,
-    use_simd: false,
     use_pnacl: false,
 
     last_stats: 0,
@@ -288,28 +287,38 @@ function watchdog_clear() {
 
 // NaCl ************************************************************************
 function module_insert() {
-    var attrs;
+    var nmf;
+    var type;
 
-    if (fah.use_simd)
-        attrs = {src: 'fahcore_b0-simd.nmf', type: 'application/x-pnacl'};
-    else if (fah.use_pnacl)
-        attrs = {src: 'fahcore_b0-pnacl.nmf', type: 'application/x-pnacl'};
-    else attrs = {src: 'fahcore_b0.nmf', type: 'application/x-nacl'};
+    if (fah.use_pnacl) {
+        var ver = 35;
+        if (36 < fah.chrome_version) ver = 37;
+        else if (35 < fah.chrome_version) ver = 36;
 
-    $('#fahcore').html($('<embed>').attr(attrs));
-    var x = $('#fahcore embed').get(0).offsetTop; // Chrome Hack
+        nmf = 'fahcore_b0-c' + ver + '-pnacl.nmf'
+        type = 'application/x-pnacl';
+
+    } else {
+        nmf = 'fahcore_b0.nmf';
+        type = 'application/x-nacl';
+    }
+
+    debug('Inserting module ' + nmf + ' with type ' + type);
+
+    $('#fahcore')
+        .html($('<embed>').attr({src: nmf, type: type}));
+
+    fah.module = $('#fahcore embed').get(0);
+    var x = fah.module.offsetTop; // Chrome Hack
+
+    if (typeof fah.module.readyState == 'undefined') module_error();
 }
 
 
 function module_loading() {
     watchdog_kick();
 
-    var name;
-    if (fah.use_simd) name = 'SIMD PNaCl';
-    else if (fah.use_pnacl) name = 'PNaCl';
-    else name = 'NaCl';
-
-    debug(name + ' module loading');
+    debug('Module loading');
     status_set('downloading', 'Downloading the Folding@home software in your ' +
                'Web browser.  On your first visit this can take a while.');
     return false;
@@ -360,8 +369,11 @@ function module_exit() {
 
 
 function module_timeout() {
-    dialog_open_fatal('nacl-error');
-    fah.pausing = fah.paused = true;
+    if (!fah.use_pnacl) module_error();
+    else {
+        dialog_open_fatal('nacl-error');
+        fah.pausing = fah.paused = true;
+    }
 }
 
 
@@ -397,13 +409,7 @@ function module_message(event) {
 function module_error(event) {
     if (fah.use_pnacl) message_warn('PNaCl module failure, fatal', 0);
 
-    else if (fah.use_simd) {
-        debug('SIMD PNaCl module failure, trying NaCl');
-        fah.use_simd = false;
-        watchdog_kick();
-        module_insert();
-
-    } else {
+    else {
         debug('NaCl module failure, trying PNaCl');
         fah.use_pnacl = true;
         watchdog_kick();
@@ -1344,8 +1350,6 @@ $(function () {
             dialog_open_fatal('nacl-error-dialog');
             return;
         }
-
-        fah.use_simd = 36 < fah.chrome_version;
 
         // Start module watchdog
         watchdog_set(10000, module_timeout);

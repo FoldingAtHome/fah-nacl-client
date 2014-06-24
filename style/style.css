@@ -457,6 +457,7 @@ a.desktop {color: #42c0fb;}
 #fahcore {
     width: 0;
     height: 0;
+    visibility: hidden;
 }
 
 img.bug-icon {
