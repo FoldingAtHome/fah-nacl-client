@@ -62,42 +62,7 @@ img {
     margin-right: 2px;
     margin-top: -2px;
     float: left;
-}
-
-#status-image.running {
-    background: url('../images/micro/running.gif') no-repeat 0px 0px #64ca7d;
-}
-
-#status-image.uploading {
-    background: url('../images/micro/upload.gif') no-repeat 0px 0px #64ca7d;
-}
-
-#status-image.downloading {
-    background: url('../images/micro/download.gif') no-repeat 0px 4px #64ca7d;
-}
-
-#status-image.waiting {
-    background: url('../images/micro/error.png') no-repeat 0px 0px transparent;
-}
-
-#status-image.error {
-    background: url('../images/micro/error.png') no-repeat 0px 0px transparent;
-}
-
-#status-image.stopped {
-    background: url('../images/micro/stopped.png') no-repeat 0px 0px #ff0000;
-}
-
-#status-image.pausing {
-    background: url('../images/micro/paused.gif') no-repeat 0px 0px #fff276;
-}
-
-#status-image.paused {
-    background: url('../images/micro/paused.png') no-repeat 0px 0px #fff276;
-}
-
-#status-image.finished {
-    background: url('../images/micro/paused.png') no-repeat 0px 0px #fff276;
+    font-size: 20px;
 }
 
 #progress {

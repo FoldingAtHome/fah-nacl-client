@@ -185,43 +185,105 @@ a.desktop {color: #42c0fb;}
     border: 3px solid #000;
     margin-right: 10px;
     margin-top: -10px;
+    padding: 0;
     float: left;
+    color: black;
+    background: #64ca7d;
+    font-size: 34px;
+    text-align: center;
 }
 
-#status-image.running {
-    background: url('../images/running.gif') no-repeat 3px 3px #64ca7d;
+#status-image.running div, #status-image.waiting div {
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
 }
 
-#status-image.uploading {
-    background: url('../images/upload.gif') no-repeat 3px 0px #64ca7d;
+#status-image.running div:after {
+    content: "\21b7";
 }
 
-#status-image.downloading {
-    background: url('../images/download.gif') no-repeat 3px 7px #64ca7d;
+#status-image.uploading div:after, #status-image.downloading div:after {
+    content: "\27bd";
+}
+
+#status-image.uploading div {
+    -webkit-animation: upload 0.5s ease infinite alternate;
+    animation: upload 0.5s ease infinite alternate;
+    -webkit-transform: rotate(-90deg) translate(2px, -1px);
+    transform: rotate(-90deg) translate(2px, -1px);
+}
+
+#status-image.downloading div {
+    -webkit-animation: download 0.5s ease infinite alternate;
+    animation: download 0.5s ease infinite alternate;
+    -webkit-transform: rotate(90deg) translate(-2px, -1px);
+    transform: rotate(90deg) translate(-2px, -1px);
 }
 
 #status-image.waiting {
-    background: url('../images/waiting.gif') no-repeat 8px 8px #ffffff;
+    background: white;
+}
+
+#status-image.waiting div:after {
+    content: "\231b";
 }
 
 #status-image.error {
-    background: url('../images/error.png') no-repeat 3px 3px #ff0000;
+    background: #ff0000;
 }
 
-#status-image.stopped {
-    background: url('../images/stopped.png') no-repeat 4px 5px #ff0000;
+#status-image.error div:after {
+    content: "\2620";
 }
 
-#status-image.pausing {
-    background: url('../images/waiting.gif') no-repeat 8px 8px #fff276;
+#status-image.paused, #status-image.finished {
+    background: #fff276;
 }
 
-#status-image.paused {
-    background: url('../images/paused.png') no-repeat 4px 4px #fff276;
+#status-image.paused div:after, #status-image.finished div:after {
+    content: "\2615";
 }
 
-#status-image.finished {
-    background: url('../images/paused.png') no-repeat 4px 4px #fff276;
+@-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes upload {
+    to {
+        -webkit-transform: rotate(-90deg) translate(-4px, -1px);
+        transform: rotate(-90deg) translate(-4px, -1px);
+    }
+}
+
+@keyframes upload {
+    to {
+        -webkit-transform: rotate(-90deg) translate(-4px, -1px);
+        transform: rotate(-90deg) translate(-4px, -1px);
+    }
+}
+
+@-webkit-keyframes download {
+    to {
+        -webkit-transform: rotate(90deg) translate(4px, -1px);
+        transform: rotate(90deg) translate(4px, -1px);
+    }
+}
+
+@keyframes download {
+    to {
+        -webkit-transform: rotate(90deg) translate(4px, -1px);
+        transform: rotate(90deg) translate(4px, -1px);
+    }
 }
 
 #progress {
