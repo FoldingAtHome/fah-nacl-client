@@ -199,7 +199,7 @@ a.desktop {color: #42c0fb;}
 }
 
 #status-image.running div:after {
-    content: "\21b7";
+    content: "\21bb";
 }
 
 #status-image.uploading div:after, #status-image.downloading div:after {
