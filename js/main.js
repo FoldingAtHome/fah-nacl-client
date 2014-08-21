@@ -855,6 +855,7 @@ function server_call(url, data, success, error, upload, download) {
     if (typeof data == 'undefined') data = {};
     data.version = fah.version;
     data.type = 'NACL';
+    data.subtype = fah.micro ? 'NACL_MICRO' : 'NACL_FULL';
     data.os = 'NACL';
     data.user = fah.user;
     data.team = fah.team;
