@@ -690,6 +690,27 @@ function eta_update(count) {
     return eta;
 }
 
+//
+// added 2015/02/01
+// suggested by 7im
+// finalised by ChristianVirtual
+//
+function ppd_update() {
+  var ppd = 0;
+  var wu_time = 0;
+  var now = new Date().valueOf();
+  var wu_points = 125;  //read this from wu data in next version
+  
+  // assumption: eta and wu_start are same kind of timestamps (based on ms)
+  wu_time = ((now - fah.wu_start) / 1000.0) + fah.last_eta;
+  
+  // Number of WU per day =  DAY / wu_time 
+  // PPD = number of WU per day * 125 points per WU
+  ppd = int((DAY / wu_time) * wu_points);
+  
+  return ppd;
+}
+
 
 function power_init() {
     if (fah.micro) return;
@@ -760,6 +781,14 @@ function progress_update(current) {
     else eta = 'Completion expected in ' + friendly_time(eta) + '.';
     if (eta != fah.last_eta_text) $('#eta').text(eta);
     fah.last_eta_text = eta;
+    
+    // added 2015/02/01 ChristianVirtual
+    var ppd_show = ppd_update()
+    ppd_text = 'estimated Points per Day (PPD): ' + human_number(ppd_show);
+    if (ppd_text != fah.last_ppd_text) $('#ppd').text(human_number(ppd_text));
+    fah.last_ppd_text = ppd_text
+    
+
 }
 
 
