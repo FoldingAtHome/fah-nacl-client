@@ -784,6 +784,12 @@ function progress_update(current) {
     
     // added 2015/02/01 ChristianVirtual
     var ppd_show = ppd_update()
+    var digit = int(Math.log(ppd_show) / Math.log(10))
+    if (digit > 2)
+    {
+       // subpress last two digits in case of bigger numbers; avoid bouncing numbers on screen
+       ppd_show = int(ppd_show / 100) * 100;  // cut off two digits to avoid too much noise 
+    }
     ppd_text = 'estimated Points per Day (PPD): ' + human_number(ppd_show);
     if (ppd_text != fah.last_ppd_text) $('#ppd').text(human_number(ppd_text));
     fah.last_ppd_text = ppd_text
