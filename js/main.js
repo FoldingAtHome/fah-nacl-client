@@ -25,7 +25,7 @@
 */
 
 var fah = {
-    version: '8.1.0',
+    version: '8.1.1',
     user: 'Anonymous',
     team: 0,
 
@@ -690,6 +690,27 @@ function eta_update(count) {
     return eta;
 }
 
+//
+// added 2015/02/01
+// suggested by 7im
+// finalised by ChristianVirtual
+//
+function ppd_update() {
+  var ppd = 0;
+  var wu_time = 0;
+  var now = new Date().valueOf();
+  var wu_points = 125;  //read this from wu data in next version
+  
+  // assumption: eta (in sec) and now/wu_start (in ms)
+  wu_time = ((now - fah.wu_start) / 1000.0) + fah.last_eta;
+  
+  // Number of WU per day =  DAY / wu_time 
+  // PPD = number of WU per day * 125 points per WU
+  ppd = int((DAY / wu_time) * wu_points);
+  
+  return ppd;
+}
+
 
 function power_init() {
     if (fah.micro) return;
@@ -760,6 +781,20 @@ function progress_update(current) {
     else eta = 'Completion expected in ' + friendly_time(eta) + '.';
     if (eta != fah.last_eta_text) $('#eta').text(eta);
     fah.last_eta_text = eta;
+    
+    // added 2015/02/01 ChristianVirtual
+    var ppd_show = ppd_update()
+    var digit = int(Math.log(ppd_show) / Math.log(10))
+    if (digit > 2)
+    {
+       // subpress last two digits in case of bigger numbers; avoid bouncing numbers on screen
+       ppd_show = int(ppd_show / 100) * 100;  // cut off two digits to avoid too much noise 
+    }
+    ppd_text = 'Estimated Points Per Day (PPD): ' + human_number(ppd_show);
+    if (ppd_text != fah.last_ppd_text) $('#ppd').text(human_number(ppd_text));
+    fah.last_ppd_text = ppd_text
+    
+
 }
 
 
@@ -1020,7 +1055,7 @@ function start_wu(data) {
 
 
 function step_wu(total, count) {
-    status_set('running', 'Calculations underway.');
+    status_set('running', (fah.finish) ? 'Calculations underway; then finishing.' : 'Calculations underway.');
     fah.progress_total = total;
     var eta = (total - count) / 10; // TODO
     progress_update(count, eta);
