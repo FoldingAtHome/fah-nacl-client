@@ -928,7 +928,7 @@ function as_call(cmd, data, success, error) {
 
 
 function ws_call(ws, cmd, data, success, error, upload, download) {
-    server_call('http://' + ws + ':8080/api/' + cmd, data, success, error,
+    server_call('http://' + ws + '/api/' + cmd, data, success, error,
                 upload, download);
 }
 
