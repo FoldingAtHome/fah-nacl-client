@@ -1029,7 +1029,8 @@ function request_wu(data) {
   status_set('downloading', 'Downloading a work unit.');
 
   progress_start(1);
-  ws_call(fah.ws, 'assign', {assignment: assign, signature: data[2]},
+  ws_call(fah.ws, 'assign', {assignment: assign, signature: data[2],
+                             as_cert: data[3]},
           start_wu, ws_assign_error, undefined, progress_update);
 }
 
