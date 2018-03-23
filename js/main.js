@@ -1036,7 +1036,7 @@ function request_wu(data) {
 
 
 function start_wu(data) {
-  if (typeof data == 'undefined' || data[0] != 'wu' || data.length != 5) {
+  if (typeof data == 'undefined' || data[0] != 'wu' || data.length != 6) {
     message_warn('Unexpected response to WU assignment request: ' + data);
     assign_error();
     return;
@@ -1051,8 +1051,8 @@ function start_wu(data) {
 
   status_set('running', 'Starting work unit.');
   progress_start(0);
-  post_message(['start', JSON.stringify(wu), data[2], data[3], fah.as_cert,
-                str2ab(data[4])]);
+  post_message(['start', JSON.stringify(wu), data[2], data[3], data[4],
+                str2ab(data[5])]);
   post_message(['power', config_get('power')]);
 
   intercom_emit('pause'); // Tell other instances to pause
