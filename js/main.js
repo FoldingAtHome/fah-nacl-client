@@ -32,9 +32,9 @@ var fah = {
   intercom_id: 'fah-nacl-client',
   timestamp: new Date().getTime(),
 
-  as_urls: ['//assign2.foldingathome.org', '//assign5.stanford.edu'],
-  stats_url: '//folding.stanford.edu/stats.py',
-  project_url: '//folding.stanford.edu/project-jsonp.py',
+  as_urls: ['//assign1.foldingathome.org', '//assign2.foldingathome.org'],
+  stats_url: '//apps.foldingathome.org/stats.py',
+  project_url: '//apps.foldingathome.org/project-jsonp.py',
 
   current_as: 0,
 
@@ -1355,7 +1355,7 @@ $(function () {
   });
 
   // Share Links
-  var share_url = 'https%3A%2F%2Ffolding.stanford.edu%2Fnacl%2F';
+  var share_url = 'https%3A%2F%2Ffoldingathome.org%2Fnacl%2F';
   var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';
 
   $('a.twitter').attr({href: '//twitter.com/share?url=' + share_url +
