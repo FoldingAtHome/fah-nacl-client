@@ -1355,7 +1355,7 @@ $(function () {
   });
 
   // Share Links
-  var share_url = 'https%3A%2F%2Ffoldingathome.org%2Fnacl%2F';
+  var share_url = 'http%3A%2F%2Fnacl.foldingathome.org%2F';
   var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';
 
   $('a.twitter').attr({href: '//twitter.com/share?url=' + share_url +
