@@ -989,8 +989,17 @@ function request_id_error(jqXHR, status, error) {
 function request_assignment() {
   status_set('downloading', 'Requesting a work server assignment.');
   delete fah.results;
-  as_call('assign', {client_id: config_get('id'), threads: fah.threads},
-          request_wu, as_assign_error);
+
+  var data = {
+    client_id: config_get('id'),
+    threads: fah.threads
+  }
+
+  var projectKey = get_query('project-key');
+  if (typeof projectKey != 'undefined')
+    data.project_key = projectKey;
+
+  as_call('assign', data, request_wu, as_assign_error);
 }
 
 
