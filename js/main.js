@@ -1357,12 +1357,6 @@ $(function () {
   // Save identity
   $('.save-id').click(save_identity);
 
-  // Enable Bug Reporting
-  $('.report-bug').on('click', function(e) {
-    e.preventDefault();
-    bug_report();
-  });
-
   // Share Links
   var share_url = 'http%3A%2F%2Fnacl.foldingathome.org%2F';
   var share_text = 'Share+your+unused+computer+power+to+help+find+a+cure.';

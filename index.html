@@ -46,12 +46,10 @@
     <script src="js/jquery.cookie.js"></script>
     <link rel="stylesheet" href="style/jquery-ui.min.css"/>
     <script src="js/jquery-ui.min.js"></script>
-    <script src="https://apis.google.com/js/plusone.js"></script>
     <script src="js/intercom.min.js"></script>
     <script src="//www.google-analytics.com/urchin.js"></script>
     <link rel="stylesheet" href="style/style.css"/>
     <script src="js/main.js"></script>
-    <script src="js/bug.js"></script>
   </head>
 
   <body>
@@ -69,10 +67,6 @@
               </span>
               <span>
                 <a href="#" class="twitter"><img src="images/twitter.png"/></a>
-              </span>
-              <span class="google-button">
-                <div class="g-plusone" data-size="standard"
-                     data-href="http://nacl.foldingathome.org/"></div>
               </span>
             </td>
             <td class="middle">
@@ -263,7 +257,7 @@
       <h4>FAQ</h4>
       <p>Start here to find answers to
         <a href="https://foldingathome.org/faq/"
-           >Frequently Asked Questions</a>.
+           >Frequently Asked Questions</a> about Folding@home.
       </p>
 
       <h4>Community Support</h4>
@@ -274,8 +268,9 @@
       </p>
 
       <h4>Software Bugs</h4>
-      <p>Please <a class="report-bug" href="#">click here
-          <img class="bug-icon" src="images/report-bug.png"/></a>
+      <p>Please
+        <a href="https://github.com/FoldingAtHome/fah-nacl-client/issues">click
+          here <img class="bug-icon" src="images/report-bug.png"/></a>
         to report bugs.
       </p>
 
@@ -370,75 +365,6 @@
         <li><a href="https://foldingathome.org/passkey"
            >Passkey FAQ</a>.</li>
       </ul>
-    </div>
-
-    <div id="bug-submission-dialog"
-         title="Submitting Bug Report. Please wait. . .">
-      <img src="images/report-bug.png"/>
-      <iframe id="bug-iframe" name="bug-iframe"></iframe>
-    </div>
-
-    <div id="bug-dialog" title="Submit a Bug Report">
-      <img src="images/report-bug.png"/>
-      <form method="post" target="bug-iframe"
-            action="//apps.foldingathome.org/bugreport.php">
-        <table>
-          <tr><th>Name:</th><td class="user"></td>
-            <input name="user" hidden="true"/>
-          </tr>
-          <tr>
-            <th>Team:</th> <td class="team"></td>
-            <input name="team" hidden="true"/>
-          </tr>
-          <tr>
-            <th>Category:</th>
-            <td>
-              <select name="category">
-                <option value="choose" selected>-- Please choose --</option>
-                <option value="conectivity">Connectivity issue</option>
-                <option value="documentation">Documentation error</option>
-                <option value="enhancement">Enhancement request</option>
-                <option value="overuse">Resources overutilized</option>
-                <option value="underuse">Resources underutilized</option>
-                <option value="cosmetic">Cosmetic defect</option>
-              </select>
-          </td></tr>
-          <tr class="description">
-            <td colspan="2"><b>Please provide a brief description:</b>
-              <textarea name="description" rows="4" maxlength="1024"
-                        ></textarea>
-            </td>
-          </tr>
-        </table>
-        <input name="ts" type="hidden"/>
-        <input name="client" type="hidden" value="nacl"/>
-      </form>
-      <div id="bug-disclaimer">
-        <p>
-          <b>Disclaimer:</b> When you submit this form your
-          Folding@home user name, team, all or portions of the log
-          files produced by the Folding@home software and all the
-          information you provide in this form will be stored
-          indefinitely on servers at foldingathome.org.  Your IP
-          address will be logged but not made public.  <b>Do not
-            include passwords, copyrighted material or any other
-            information which you do not want to be made public.
-          </b>
-        </p>
-        <p>
-          By submitting this form you acknowledge that you are
-          making said information publicly available on the Internet
-          and agree to let foldingathome.org, it's partners and members of
-          foldingforum.org use said information for the purpose of
-          improving the Folding@home software.  The collected
-          information will not be used for advertising or tracking
-          your activity.  If you do not agree with these terms
-          please do not submit this forum and instead press the
-          Cancel button now.
-        </p>
-      </div>
-      <p>To see a list of bug reports submitted from this IP address click
-        <a href="//apps.foldingathome.org/bugreport.php">here</a>.</p>
     </div>
 
     <div title="Failed to load software" id="load-failed">
